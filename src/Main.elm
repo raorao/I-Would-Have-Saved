@@ -1,65 +1,36 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, a)
-import Html.Attributes exposing (href)
+import Navigation
+import Router
+import Model
+import Update exposing (Msg(..))
+import View
 
 
----- MODEL ----
+init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
+init config location =
+    let
+        pageModel =
+            case Router.parseLocation location of
+                Just Router.LoggedOut ->
+                    Model.LoggedOut
+
+                Just (Router.LoggedIn (Just token)) ->
+                    Model.LoggedIn token
+
+                Just (Router.LoggedIn Nothing) ->
+                    Model.Error
+
+                Nothing ->
+                    Model.Error
+    in
+        ( { config = config, pageModel = pageModel }, Cmd.none )
 
 
-type alias Config =
-    { ynab_client_id : String, ynab_redirect_uri : String }
-
-
-type alias Model =
-    { config : Config }
-
-
-init : Config -> ( Model, Cmd Msg )
-init config =
-    ( { config = config }, Cmd.none )
-
-
-
----- UPDATE ----
-
-
-type Msg
-    = NoOp
-
-
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    ( model, Cmd.none )
-
-
-
----- VIEW ----
-
-
-ynabURL : Config -> String
-ynabURL { ynab_client_id, ynab_redirect_uri } =
-    "https://app.youneedabudget.com/oauth/authorize?client_id="
-        ++ ynab_client_id
-        ++ "&redirect_uri="
-        ++ ynab_redirect_uri
-        ++ "&response_type=token"
-
-
-view : Model -> Html Msg
-view model =
-    div [] [ a [ href (ynabURL model.config) ] [ text "Login to YNAB" ] ]
-
-
-
----- PROGRAM ----
-
-
-main : Program Config Model Msg
 main =
-    Html.programWithFlags
-        { view = view
+    Navigation.programWithFlags (always NoOp)
+        { view = View.view
         , init = init
-        , update = update
+        , update = Update.update
         , subscriptions = always Sub.none
         }
