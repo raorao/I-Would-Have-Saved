@@ -1,5 +1,8 @@
 module Model exposing (..)
 
+import RemoteData exposing (..)
+import Http
+
 
 type alias Config =
     { ynab_client_id : String
@@ -7,17 +10,19 @@ type alias Config =
     }
 
 
+type Page
+    = LoggedIn
+    | LoggedOut
+    | Error
+
+
 type alias Model =
     { config : Config
-    , pageModel : PageModel
+    , page : Page
+    , token : Maybe AccessToken
+    , transactions : RemoteData Http.Error (List String)
     }
 
 
 type alias AccessToken =
     String
-
-
-type PageModel
-    = LoggedOut
-    | LoggedIn AccessToken
-    | Error

@@ -12,7 +12,7 @@ type Route
 routeTable : Parser (Route -> a) a
 routeTable =
     oneOf
-        [ map LoggedIn (s "home" <?> stringParam "token")
+        [ map LoggedIn (s "home" <?> stringParam "access_token")
         , map LoggedOut (s "sign_in")
         ]
 

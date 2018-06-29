@@ -5,26 +5,25 @@ import Router
 import Model
 import Update exposing (Msg(..))
 import View
+import Task
+import RemoteData
 
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
 init config location =
     let
-        pageModel =
+        ( page, token, cmd ) =
             case Router.parseLocation location of
                 Just Router.LoggedOut ->
-                    Model.LoggedOut
+                    ( Model.LoggedOut, Nothing, Cmd.none )
 
-                Just (Router.LoggedIn (Just token)) ->
-                    Model.LoggedIn token
-
-                Just (Router.LoggedIn Nothing) ->
-                    Model.Error
+                Just (Router.LoggedIn maybeToken) ->
+                    ( Model.LoggedIn, maybeToken, (send FetchTransactions) )
 
                 Nothing ->
-                    Model.Error
+                    ( Model.Error, Nothing, Cmd.none )
     in
-        ( { config = config, pageModel = pageModel }, Cmd.none )
+        ( { config = config, page = page, token = token, transactions = RemoteData.NotAsked }, cmd )
 
 
 main =
@@ -34,3 +33,9 @@ main =
         , update = Update.update
         , subscriptions = always Sub.none
         }
+
+
+send : msg -> Cmd msg
+send msg =
+    Task.succeed msg
+        |> Task.perform identity
