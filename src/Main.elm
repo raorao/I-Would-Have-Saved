@@ -1,19 +1,23 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img)
-import Html.Attributes exposing (src)
+import Html exposing (Html, text, div, h1, a)
+import Html.Attributes exposing (href)
 
 
 ---- MODEL ----
 
 
+type alias Config =
+    { ynab_client_id : String, ynab_redirect_uri : String }
+
+
 type alias Model =
-    {}
+    { config : Config }
 
 
-init : ( Model, Cmd Msg )
-init =
-    ( {}, Cmd.none )
+init : Config -> ( Model, Cmd Msg )
+init config =
+    ( { config = config }, Cmd.none )
 
 
 
@@ -33,21 +37,27 @@ update msg model =
 ---- VIEW ----
 
 
+ynabURL : Config -> String
+ynabURL { ynab_client_id, ynab_redirect_uri } =
+    "https://app.youneedabudget.com/oauth/authorize?client_id="
+        ++ ynab_client_id
+        ++ "&redirect_uri="
+        ++ ynab_redirect_uri
+        ++ "&response_type=token"
+
+
 view : Model -> Html Msg
 view model =
-    div []
-        [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
-        ]
+    div [] [ a [ href (ynabURL model.config) ] [ text "Login to YNAB" ] ]
 
 
 
 ---- PROGRAM ----
 
 
-main : Program Never Model Msg
+main : Program Config Model Msg
 main =
-    Html.program
+    Html.programWithFlags
         { view = view
         , init = init
         , update = update
