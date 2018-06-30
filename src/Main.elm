@@ -23,10 +23,13 @@ init config location =
                     ( Model.LoggedOut, Nothing, Cmd.none )
 
                 Just (Router.Loading maybeToken) ->
-                    ( Model.Loading, maybeToken, (send FetchBudgets) )
+                    ( Model.Loading "Loading Budgets..."
+                    , maybeToken
+                    , (send FetchBudgets)
+                    )
 
                 Nothing ->
-                    ( Model.Error, Nothing, Cmd.none )
+                    ( Model.Error Model.InvalidRoute, Nothing, Cmd.none )
     in
         ( { config = config
           , page = page

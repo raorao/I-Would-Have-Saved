@@ -33,7 +33,7 @@ update msg model =
         FetchBudgets ->
             case model.token of
                 Nothing ->
-                    ( model, Cmd.none )
+                    ( { model | page = Model.Error Model.NoAccessToken }, Cmd.none )
 
                 Just token ->
                     let
@@ -44,7 +44,7 @@ update msg model =
                     in
                         ( { model
                             | budgets = RemoteData.Loading
-                            , page = Model.Loading
+                            , page = Model.Loading "Loading Budgets..."
                           }
                         , requestCmd
                         )
@@ -54,10 +54,12 @@ update msg model =
                 ( page, cmd ) =
                     case Zipper.toList budgets of
                         [] ->
-                            ( Model.Error, Cmd.none )
+                            ( Model.Error Model.ImpossibleState, Cmd.none )
 
                         [ _ ] ->
-                            ( Model.Loading, send FetchTransactions )
+                            ( Model.Loading "Loading Transactions..."
+                            , send FetchTransactions
+                            )
 
                         _ ->
                             ( Model.BudgetSelector, Cmd.none )
@@ -72,7 +74,7 @@ update msg model =
         BudgetsFetched (Err error) ->
             ( { model
                 | budgets = RemoteData.Failure error
-                , page = Model.Loading
+                , page = Model.Error Model.ApiDown
               }
             , Cmd.none
             )
@@ -93,7 +95,7 @@ update msg model =
             in
                 ( { model
                     | budgets = newBudgets
-                    , page = Model.Loading
+                    , page = Model.Loading "Loading Transactions..."
                   }
                 , send FetchTransactions
                 )
@@ -101,7 +103,7 @@ update msg model =
         FetchTransactions ->
             case model.token of
                 Nothing ->
-                    ( model, Cmd.none )
+                    ( { model | page = Model.Error Model.NoAccessToken }, Cmd.none )
 
                 Just token ->
                     let
@@ -116,7 +118,7 @@ update msg model =
                     in
                         ( { model
                             | transactions = RemoteData.Loading
-                            , page = Model.Loading
+                            , page = Model.Loading "Loading Transactions..."
                           }
                         , requestCmd
                         )
@@ -130,7 +132,12 @@ update msg model =
             )
 
         TransactionsFetched (Err error) ->
-            ( { model | transactions = RemoteData.Failure error }, Cmd.none )
+            ( { model
+                | transactions = RemoteData.Failure error
+                , page = Model.Error Model.ApiDown
+              }
+            , Cmd.none
+            )
 
         CategorySelected categoryFilter ->
             let

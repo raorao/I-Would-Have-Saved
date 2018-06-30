@@ -1,10 +1,12 @@
 module Page.Loading exposing (..)
 
-import Model
-import Html exposing (Html, text)
+import Html exposing (..)
 import Update
 
 
-view : Model.Model -> Html Update.Msg
-view model =
-    text "loading..."
+view : String -> Html Update.Msg
+view message =
+    div []
+        [ h2 [] [ text "I Would Have Saved..." ]
+        , text message
+        ]

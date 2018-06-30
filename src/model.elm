@@ -13,12 +13,19 @@ type alias Config =
     }
 
 
+type ErrorType
+    = NoAccessToken
+    | ApiDown
+    | InvalidRoute
+    | ImpossibleState
+
+
 type Page
-    = Loading
+    = Loading String
     | BudgetSelector
     | TransactionViewer
     | LoggedOut
-    | Error
+    | Error ErrorType
 
 
 type CategoryFilter
