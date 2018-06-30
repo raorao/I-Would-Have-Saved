@@ -71,6 +71,7 @@ fetchBudgetsDecoder =
         |> Decode.list
         |> Decode.field "budgets"
         |> Decode.field "data"
+        |> Decode.map addDefaultBudgetIfNecessary
         |> Decode.map Zipper.fromList
         |> Decode.andThen ensureAtLeastOne
 
@@ -88,3 +89,11 @@ ensureAtLeastOne maybeZipper =
 
         Nothing ->
             Decode.fail "must have at least one budget."
+
+
+addDefaultBudgetIfNecessary : List Budget -> List Budget
+addDefaultBudgetIfNecessary budgets =
+    if List.length budgets > 1 then
+        [ Model.defaultBudget ] ++ budgets
+    else
+        budgets

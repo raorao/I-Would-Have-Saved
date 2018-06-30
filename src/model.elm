@@ -77,3 +77,8 @@ type alias Transaction =
 emptyFilters : Filters
 emptyFilters =
     Filters Nothing Nothing Nothing
+
+
+defaultBudget : Budget
+defaultBudget =
+    Budget "default" "default"

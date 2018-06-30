@@ -41,6 +41,7 @@ viewRadioButtons : Zipper.Zipper Model.Budget -> List (Html Update.Msg)
 viewRadioButtons budgets =
     budgets
         |> toBudgetOptions
+        |> List.filter (\b -> b.budget.name /= "default")
         |> List.sortBy (.budget >> .name)
         |> List.map viewBudgetOption
 
