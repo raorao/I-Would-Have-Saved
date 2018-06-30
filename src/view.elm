@@ -5,6 +5,7 @@ import Model exposing (Page(..), Model, Config)
 import Update exposing (Msg)
 import Page.LoggedIn
 import Page.LoggedOut
+import Page.BudgetSelector
 
 
 view : Model -> Html Msg
@@ -15,6 +16,9 @@ view model =
 
         LoggedIn ->
             Page.LoggedOut.view model
+
+        BudgetSelector ->
+            Page.BudgetSelector.view model
 
         Error ->
             text "something went wrong during app initialization."

@@ -1,9 +1,9 @@
 module Update exposing (..)
 
 import Model
-import Http exposing (..)
-import Json.Decode exposing (list, string)
 import RemoteData
+import Http
+import Ynab
 
 
 --import Result
@@ -11,8 +11,8 @@ import RemoteData
 
 type Msg
     = NoOp
-    | FetchTransactions
-    | TransactionsFetched (Result Error (List String))
+    | FetchBudgets
+    | BudgetsFetched (Result Http.Error (List Model.Budget))
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -21,20 +21,22 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        FetchTransactions ->
+        FetchBudgets ->
             case model.token of
                 Nothing ->
                     ( model, Cmd.none )
 
                 Just token ->
                     let
-                        request =
-                            (Http.get ("https://api.youneedabudget.com/v1/budgets?access_token=" ++ token) (list string))
+                        requestCmd =
+                            token
+                                |> Ynab.fetchBudgets
+                                |> Http.send BudgetsFetched
                     in
-                        ( { model | transactions = RemoteData.Loading }, request |> Http.send TransactionsFetched )
+                        ( { model | budgets = RemoteData.Loading }, requestCmd )
 
-        TransactionsFetched (Ok a) ->
-            ( { model | transactions = RemoteData.Success a }, Cmd.none )
+        BudgetsFetched (Ok a) ->
+            ( { model | budgets = RemoteData.Success a, page = Model.BudgetSelector }, Cmd.none )
 
-        TransactionsFetched (Err e) ->
-            ( { model | transactions = RemoteData.Failure e }, Cmd.none )
+        BudgetsFetched (Err e) ->
+            ( { model | budgets = RemoteData.Failure e }, Cmd.none )

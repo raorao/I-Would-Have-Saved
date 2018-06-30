@@ -18,12 +18,12 @@ init config location =
                     ( Model.LoggedOut, Nothing, Cmd.none )
 
                 Just (Router.LoggedIn maybeToken) ->
-                    ( Model.LoggedIn, maybeToken, (send FetchTransactions) )
+                    ( Model.LoggedIn, maybeToken, (send FetchBudgets) )
 
                 Nothing ->
                     ( Model.Error, Nothing, Cmd.none )
     in
-        ( { config = config, page = page, token = token, transactions = RemoteData.NotAsked }, cmd )
+        ( { config = config, page = page, token = token, budgets = RemoteData.NotAsked }, cmd )
 
 
 main =

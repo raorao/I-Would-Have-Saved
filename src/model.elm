@@ -12,6 +12,7 @@ type alias Config =
 
 type Page
     = LoggedIn
+    | BudgetSelector
     | LoggedOut
     | Error
 
@@ -20,9 +21,15 @@ type alias Model =
     { config : Config
     , page : Page
     , token : Maybe AccessToken
-    , transactions : RemoteData Http.Error (List String)
+    , budgets : RemoteData Http.Error (List Budget)
     }
 
 
 type alias AccessToken =
     String
+
+
+type alias Budget =
+    { id : String
+    , name : String
+    }
