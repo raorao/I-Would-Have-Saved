@@ -7,6 +7,7 @@ import RemoteData exposing (RemoteData)
 import TransactionReducer
 import Dropdown
 import DatePicker
+import Round
 
 
 view : Model.Model -> Html Msg
@@ -29,6 +30,8 @@ viewSavings : Model.Filters -> List Model.Transaction -> Html Msg
 viewSavings filters transactions =
     transactions
         |> TransactionReducer.savings filters
+        |> Round.round 2
+        |> (++) "$"
         |> text
         |> List.singleton
         |> div []

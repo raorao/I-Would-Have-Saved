@@ -5,7 +5,7 @@ import List.Extra
 import Date.Extra.Compare as DateCompare
 
 
-savings : Filters -> List Transaction -> String
+savings : Filters -> List Transaction -> Float
 savings filters transactions =
     transactions
         |> List.filter (applySince filters.since)
@@ -14,7 +14,7 @@ savings filters transactions =
         |> List.sum
         |> toFloat
         |> applyAdjustment filters.adjustment
-        |> format
+        |> toDollars
 
 
 categories : List Transaction -> List String
@@ -35,13 +35,9 @@ applyAdjustment adjustment currentSavings =
             currentSavings
 
 
-format : Float -> String
-format amount =
-    let
-        inDollars =
-            -amount / 1000.0
-    in
-        "$" ++ (toString inDollars)
+toDollars : Float -> Float
+toDollars amount =
+    -amount / 1000.0
 
 
 applyCategory : Maybe CategoryFilter -> Transaction -> Bool
