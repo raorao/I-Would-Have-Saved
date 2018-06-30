@@ -21,6 +21,7 @@ categories : List Transaction -> List String
 categories transactions =
     transactions
         |> List.map .category
+        |> List.filterMap identity
         |> List.Extra.unique
         |> List.sort
 
@@ -42,12 +43,12 @@ toDollars amount =
 
 applyCategory : Maybe CategoryFilter -> Transaction -> Bool
 applyCategory categoryFilter transaction =
-    case categoryFilter of
-        Just (CategoryFilter category) ->
-            transaction.category == category
-
-        Nothing ->
-            False
+    let
+        matches (CategoryFilter filterCategory) transactionCategory =
+            filterCategory == transactionCategory
+    in
+        Maybe.map2 matches categoryFilter transaction.category
+            |> Maybe.withDefault False
 
 
 applySince : Maybe SinceFilter -> Transaction -> Bool

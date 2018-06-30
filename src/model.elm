@@ -68,8 +68,8 @@ type alias Budget =
 type alias Transaction =
     { id : String
     , amount : Int
-    , category : String
-    , payee : String
+    , category : Maybe String
+    , payee : Maybe String
     , date : Date
     }
 

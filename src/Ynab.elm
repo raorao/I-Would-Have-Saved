@@ -40,8 +40,8 @@ transactionDecoder =
     Decode.map5 Transaction
         (Decode.field "id" Decode.string)
         (Decode.field "amount" Decode.int)
-        (Decode.field "category_name" Decode.string)
-        (Decode.field "payee_name" Decode.string)
+        (Decode.field "category_name" (Decode.nullable Decode.string))
+        (Decode.field "payee_name" (Decode.nullable Decode.string))
         (Decode.field "date" decodeDate)
 
 
