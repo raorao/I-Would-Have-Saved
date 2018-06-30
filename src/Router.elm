@@ -6,13 +6,13 @@ import Navigation
 
 type Route
     = LoggedOut
-    | LoggedIn (Maybe String)
+    | Loading (Maybe String)
 
 
 routeTable : Parser (Route -> a) a
 routeTable =
     oneOf
-        [ map LoggedIn (s "home" <?> stringParam "access_token")
+        [ map Loading (s "home" <?> stringParam "access_token")
         , map LoggedOut (s "sign_in")
         ]
 

@@ -3,7 +3,7 @@ module View exposing (view)
 import Html exposing (Html, text)
 import Model exposing (Page(..), Model, Config)
 import Update exposing (Msg)
-import Page.LoggedIn
+import Page.Loading
 import Page.LoggedOut
 import Page.BudgetSelector
 
@@ -14,8 +14,8 @@ view model =
         LoggedOut ->
             Page.LoggedOut.view model
 
-        LoggedIn ->
-            Page.LoggedIn.view model
+        Loading ->
+            Page.Loading.view model
 
         BudgetSelector ->
             Page.BudgetSelector.view model

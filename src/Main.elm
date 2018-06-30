@@ -17,8 +17,8 @@ init config location =
                 Just Router.LoggedOut ->
                     ( Model.LoggedOut, Nothing, Cmd.none )
 
-                Just (Router.LoggedIn maybeToken) ->
-                    ( Model.LoggedIn, maybeToken, (send FetchBudgets) )
+                Just (Router.Loading maybeToken) ->
+                    ( Model.Loading, maybeToken, (send FetchBudgets) )
 
                 Nothing ->
                     ( Model.Error, Nothing, Cmd.none )

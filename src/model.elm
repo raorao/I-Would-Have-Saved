@@ -12,7 +12,7 @@ type alias Config =
 
 
 type Page
-    = LoggedIn
+    = Loading
     | BudgetSelector
     | LoggedOut
     | Error
