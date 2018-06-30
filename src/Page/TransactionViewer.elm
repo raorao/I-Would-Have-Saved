@@ -6,6 +6,7 @@ import Update exposing (Msg)
 import RemoteData exposing (RemoteData)
 import TransactionReducer
 import Dropdown
+import DatePicker
 
 
 view : Model.Model -> Html Msg
@@ -17,16 +18,17 @@ view model =
     in
         div []
             [ h2 [] [ text "I Would Have Saved..." ]
-            , viewSavings model transactions
+            , viewSavings model.filters transactions
             , viewAdjustmentSelector
             , viewCategorySelector transactions
+            , viewSinceSelector model
             ]
 
 
-viewSavings : Model.Model -> List Model.Transaction -> Html Msg
-viewSavings { filters, adjustment } transactions =
+viewSavings : Model.Filters -> List Model.Transaction -> Html Msg
+viewSavings filters transactions =
     transactions
-        |> TransactionReducer.savings filters adjustment
+        |> TransactionReducer.savings filters
         |> text
         |> List.singleton
         |> div []
@@ -114,7 +116,33 @@ selectCategory : Maybe String -> Update.Msg
 selectCategory selection =
     case selection of
         Just category ->
-            Update.FilterSelected (Model.Category category)
+            Update.CategorySelected (Model.CategoryFilter category)
 
         Nothing ->
             Update.NoOp
+
+
+viewSinceSelector : Model.Model -> Html Update.Msg
+viewSinceSelector model =
+    div []
+        [ text "Since "
+        , viewSinceDatePicker model.datePicker model.filters.since
+        ]
+
+
+viewSinceDatePicker : DatePicker.DatePicker -> Maybe Model.SinceFilter -> Html Update.Msg
+viewSinceDatePicker datePicker currentSince =
+    let
+        selected =
+            case currentSince of
+                Just (Model.SinceFilter date) ->
+                    Just date
+
+                _ ->
+                    Nothing
+    in
+        DatePicker.view
+            selected
+            DatePicker.defaultSettings
+            datePicker
+            |> Html.map Update.SetDatePicker

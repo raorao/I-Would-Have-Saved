@@ -6,6 +6,7 @@ import Http
 import Ynab
 import List.Zipper as Zipper exposing (Zipper)
 import Task
+import DatePicker
 
 
 --import Result
@@ -18,8 +19,9 @@ type Msg
     | FetchTransactions
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
-    | FilterSelected Model.Filter
+    | CategorySelected Model.CategoryFilter
     | AdjustmentSelected Model.Adjustment
+    | SetDatePicker DatePicker.Msg
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -98,11 +100,50 @@ update msg model =
         TransactionsFetched (Err e) ->
             ( { model | transactions = RemoteData.Failure e }, Cmd.none )
 
-        FilterSelected filter ->
-            ( { model | filters = [ filter ] }, Cmd.none )
+        CategorySelected categoryFilter ->
+            let
+                filters =
+                    model.filters
 
-        AdjustmentSelected adjustment ->
-            ( { model | adjustment = Just adjustment }, Cmd.none )
+                newFilters =
+                    { filters | category = Just categoryFilter }
+            in
+                ( { model | filters = newFilters }, Cmd.none )
+
+        AdjustmentSelected adjustmentFilter ->
+            let
+                filters =
+                    model.filters
+
+                newFilters =
+                    { filters | adjustment = Just adjustmentFilter }
+            in
+                ( { model | filters = newFilters }, Cmd.none )
+
+        SetDatePicker msg ->
+            let
+                ( newDatePicker, datePickerCmd, dateEvent ) =
+                    DatePicker.update DatePicker.defaultSettings msg model.datePicker
+
+                date =
+                    case dateEvent of
+                        DatePicker.Changed (Just newDate) ->
+                            Just (Model.SinceFilter newDate)
+
+                        _ ->
+                            Nothing
+
+                filters =
+                    model.filters
+
+                newFilters =
+                    { filters | since = date }
+            in
+                { model
+                    | datePicker = newDatePicker
+                    , filters = newFilters
+                }
+                    ! [ Cmd.map SetDatePicker datePickerCmd ]
 
 
 send : msg -> Cmd msg

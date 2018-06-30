@@ -2,16 +2,18 @@ module TransactionReducer exposing (savings, categories)
 
 import Model exposing (..)
 import List.Extra
+import Date.Extra.Compare as DateCompare
 
 
-savings : List Filter -> Maybe Adjustment -> List Transaction -> String
-savings filters adjustment transactions =
+savings : Filters -> List Transaction -> String
+savings filters transactions =
     transactions
-        |> List.filter (applyFilters filters)
+        |> List.filter (applySince filters.since)
+        |> List.filter (applyCategory filters.category)
         |> List.map .amount
         |> List.sum
         |> toFloat
-        |> applyAdjustment adjustment
+        |> applyAdjustment filters.adjustment
         |> format
 
 
@@ -42,13 +44,24 @@ format amount =
         "$" ++ (toString inDollars)
 
 
-applyFilters : List Filter -> Transaction -> Bool
-applyFilters filters transaction =
-    List.any (applyFilter transaction) filters
-
-
-applyFilter : Transaction -> Filter -> Bool
-applyFilter transaction filter =
-    case filter of
-        Category category ->
+applyCategory : Maybe CategoryFilter -> Transaction -> Bool
+applyCategory categoryFilter transaction =
+    case categoryFilter of
+        Just (CategoryFilter category) ->
             transaction.category == category
+
+        Nothing ->
+            False
+
+
+applySince : Maybe SinceFilter -> Transaction -> Bool
+applySince sinceFilter transaction =
+    case sinceFilter of
+        Just (SinceFilter since) ->
+            DateCompare.is
+                DateCompare.SameOrAfter
+                transaction.date
+                since
+
+        Nothing ->
+            True

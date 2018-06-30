@@ -4,6 +4,7 @@ import RemoteData exposing (..)
 import Http
 import List.Zipper exposing (Zipper)
 import Date exposing (Date)
+import DatePicker
 
 
 type alias Config =
@@ -20,8 +21,19 @@ type Page
     | Error
 
 
-type Filter
-    = Category String
+type CategoryFilter
+    = CategoryFilter String
+
+
+type SinceFilter
+    = SinceFilter Date
+
+
+type alias Filters =
+    { category : Maybe CategoryFilter
+    , since : Maybe SinceFilter
+    , adjustment : Maybe Adjustment
+    }
 
 
 type Adjustment
@@ -34,8 +46,8 @@ type alias Model =
     , token : Maybe AccessToken
     , budgets : RemoteData Http.Error (Zipper Budget)
     , transactions : RemoteData Http.Error (List Transaction)
-    , filters : List Filter
-    , adjustment : Maybe Adjustment
+    , filters : Filters
+    , datePicker : DatePicker.DatePicker
     }
 
 
@@ -60,3 +72,8 @@ type alias Transaction =
     , payee : String
     , date : Date
     }
+
+
+emptyFilters : Filters
+emptyFilters =
+    Filters Nothing Nothing Nothing
