@@ -14,6 +14,7 @@ type alias Config =
 type Page
     = Loading
     | BudgetSelector
+    | TransactionViewer
     | LoggedOut
     | Error
 
@@ -23,6 +24,7 @@ type alias Model =
     , page : Page
     , token : Maybe AccessToken
     , budgets : RemoteData Http.Error (Zipper Budget)
+    , transactions : RemoteData Http.Error (List Transaction)
     }
 
 
@@ -30,7 +32,20 @@ type alias AccessToken =
     String
 
 
+type alias BudgetId =
+    String
+
+
 type alias Budget =
-    { id : String
+    { id : BudgetId
     , name : String
+    }
+
+
+type alias Transaction =
+    { id : String
+    , amount : Int
+    , category : String
+    , payee : String
+    , date : String
     }

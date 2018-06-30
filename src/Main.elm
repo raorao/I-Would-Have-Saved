@@ -23,7 +23,14 @@ init config location =
                 Nothing ->
                     ( Model.Error, Nothing, Cmd.none )
     in
-        ( { config = config, page = page, token = token, budgets = RemoteData.NotAsked }, cmd )
+        ( { config = config
+          , page = page
+          , token = token
+          , transactions = RemoteData.NotAsked
+          , budgets = RemoteData.NotAsked
+          }
+        , cmd
+        )
 
 
 main =
