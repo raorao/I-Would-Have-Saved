@@ -12,10 +12,10 @@ view : Model -> Html Msg
 view model =
     case model.page of
         LoggedOut ->
-            Page.LoggedIn.view model
+            Page.LoggedOut.view model
 
         LoggedIn ->
-            Page.LoggedOut.view model
+            Page.LoggedIn.view model
 
         BudgetSelector ->
             Page.BudgetSelector.view model
