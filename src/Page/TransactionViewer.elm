@@ -12,16 +12,15 @@ view : Model.Model -> Html Msg
 view model =
     div []
         [ h2 [] [ text "I Would Have Spent" ]
-        , viewSavings model.transactions
+        , viewSavings model.filters model.transactions
         ]
 
 
-viewSavings : RemoteData Http.Error (List Model.Transaction) -> Html Msg
-viewSavings transactions =
+viewSavings : List Model.Filter -> RemoteData Http.Error (List Model.Transaction) -> Html Msg
+viewSavings filters transactions =
     transactions
         |> RemoteData.withDefault []
-        |> TransactionReducer.savings
-        |> toString
+        |> TransactionReducer.savings filters
         |> text
         |> List.singleton
         |> div []

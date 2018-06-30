@@ -19,12 +19,17 @@ type Page
     | Error
 
 
+type Filter
+    = Category String
+
+
 type alias Model =
     { config : Config
     , page : Page
     , token : Maybe AccessToken
     , budgets : RemoteData Http.Error (Zipper Budget)
     , transactions : RemoteData Http.Error (List Transaction)
+    , filters : List Filter
     }
 
 
