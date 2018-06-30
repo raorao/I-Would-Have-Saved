@@ -4,6 +4,7 @@ import Model
 import RemoteData
 import Http
 import Ynab
+import List.Zipper as Zipper exposing (Zipper)
 
 
 --import Result
@@ -12,7 +13,8 @@ import Ynab
 type Msg
     = NoOp
     | FetchBudgets
-    | BudgetsFetched (Result Http.Error (List Model.Budget))
+    | BudgetsFetched (Result Http.Error (Zipper Model.Budget))
+    | SelectBudget Model.Budget
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -40,3 +42,19 @@ update msg model =
 
         BudgetsFetched (Err e) ->
             ( { model | budgets = RemoteData.Failure e }, Cmd.none )
+
+        SelectBudget budget ->
+            let
+                newBudgets =
+                    case model.budgets of
+                        RemoteData.Success budgets ->
+                            budgets
+                                |> Zipper.first
+                                |> Zipper.find (\b -> b.name == budget.name)
+                                |> Maybe.withDefault budgets
+                                |> RemoteData.Success
+
+                        _ ->
+                            model.budgets
+            in
+                ( { model | budgets = newBudgets }, Cmd.none )

@@ -2,6 +2,7 @@ module Model exposing (..)
 
 import RemoteData exposing (..)
 import Http
+import List.Zipper exposing (Zipper)
 
 
 type alias Config =
@@ -21,7 +22,7 @@ type alias Model =
     { config : Config
     , page : Page
     , token : Maybe AccessToken
-    , budgets : RemoteData Http.Error (List Budget)
+    , budgets : RemoteData Http.Error (Zipper Budget)
     }
 
 
