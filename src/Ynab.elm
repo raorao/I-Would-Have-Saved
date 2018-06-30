@@ -4,6 +4,8 @@ import Json.Decode as Decode
 import Http exposing (..)
 import Model exposing (Budget, AccessToken, BudgetId, Transaction)
 import List.Zipper as Zipper exposing (Zipper)
+import Date exposing (Date)
+import Result exposing (..)
 
 
 fetchBudgets : String -> Request (Zipper Budget)
@@ -40,7 +42,22 @@ transactionDecoder =
         (Decode.field "amount" Decode.int)
         (Decode.field "category_name" Decode.string)
         (Decode.field "payee_name" Decode.string)
-        (Decode.field "date" Decode.string)
+        (Decode.field "date" decodeDate)
+
+
+decodeDate : Decode.Decoder Date
+decodeDate =
+    let
+        decodeDateOrFail str =
+            case Date.fromString str of
+                Ok date ->
+                    Decode.succeed date
+
+                Err e ->
+                    Decode.fail e
+    in
+        Decode.string
+            |> Decode.andThen (decodeDateOrFail)
 
 
 fetchBudgetsUrl : String -> String

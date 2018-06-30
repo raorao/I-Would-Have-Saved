@@ -3,6 +3,7 @@ module Model exposing (..)
 import RemoteData exposing (..)
 import Http
 import List.Zipper exposing (Zipper)
+import Date exposing (Date)
 
 
 type alias Config =
@@ -57,5 +58,5 @@ type alias Transaction =
     , amount : Int
     , category : String
     , payee : String
-    , date : String
+    , date : Date
     }
