@@ -18,6 +18,7 @@ type Msg
     | FetchTransactions
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
+    | FilterSelected Model.Filter
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -95,6 +96,9 @@ update msg model =
 
         TransactionsFetched (Err e) ->
             ( { model | transactions = RemoteData.Failure e }, Cmd.none )
+
+        FilterSelected filter ->
+            ( { model | filters = [ filter ] }, Cmd.none )
 
 
 send : msg -> Cmd msg

@@ -1,6 +1,7 @@
-module TransactionReducer exposing (savings)
+module TransactionReducer exposing (savings, categories)
 
 import Model exposing (..)
+import List.Extra
 
 
 savings : List Filter -> List Transaction -> String
@@ -10,6 +11,14 @@ savings filters transactions =
         |> List.map .amount
         |> List.sum
         |> format
+
+
+categories : List Transaction -> List String
+categories transactions =
+    transactions
+        |> List.map .category
+        |> List.Extra.unique
+        |> List.sort
 
 
 format : Int -> String

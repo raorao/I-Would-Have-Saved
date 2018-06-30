@@ -28,7 +28,7 @@ init config location =
           , token = token
           , transactions = RemoteData.NotAsked
           , budgets = RemoteData.NotAsked
-          , filters = [ Model.Category "Groceries" ]
+          , filters = []
           }
         , cmd
         )
