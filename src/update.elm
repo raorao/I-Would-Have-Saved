@@ -42,7 +42,12 @@ update msg model =
                                 |> Ynab.fetchBudgets
                                 |> Http.send BudgetsFetched
                     in
-                        ( { model | budgets = RemoteData.Loading }, requestCmd )
+                        ( { model
+                            | budgets = RemoteData.Loading
+                            , page = Model.Loading
+                          }
+                        , requestCmd
+                        )
 
         BudgetsFetched (Ok budgets) ->
             let
@@ -65,7 +70,12 @@ update msg model =
                 )
 
         BudgetsFetched (Err error) ->
-            ( { model | budgets = RemoteData.Failure error }, Cmd.none )
+            ( { model
+                | budgets = RemoteData.Failure error
+                , page = Model.Loading
+              }
+            , Cmd.none
+            )
 
         SelectBudget budget ->
             let
@@ -81,7 +91,12 @@ update msg model =
                         _ ->
                             model.budgets
             in
-                ( { model | budgets = newBudgets }, send FetchTransactions )
+                ( { model
+                    | budgets = newBudgets
+                    , page = Model.Loading
+                  }
+                , send FetchTransactions
+                )
 
         FetchTransactions ->
             case model.token of
@@ -99,7 +114,12 @@ update msg model =
                                 |> Maybe.map (Http.send TransactionsFetched)
                                 |> Maybe.withDefault Cmd.none
                     in
-                        ( { model | transactions = RemoteData.Loading }, requestCmd )
+                        ( { model
+                            | transactions = RemoteData.Loading
+                            , page = Model.Loading
+                          }
+                        , requestCmd
+                        )
 
         TransactionsFetched (Ok transactions) ->
             ( { model
