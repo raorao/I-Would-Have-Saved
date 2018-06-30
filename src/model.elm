@@ -23,6 +23,10 @@ type Filter
     = Category String
 
 
+type Adjustment
+    = Adjustment Float
+
+
 type alias Model =
     { config : Config
     , page : Page
@@ -30,6 +34,7 @@ type alias Model =
     , budgets : RemoteData Http.Error (Zipper Budget)
     , transactions : RemoteData Http.Error (List Transaction)
     , filters : List Filter
+    , adjustment : Maybe Adjustment
     }
 
 

@@ -19,6 +19,7 @@ type Msg
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
     | FilterSelected Model.Filter
+    | AdjustmentSelected Model.Adjustment
 
 
 update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
@@ -99,6 +100,9 @@ update msg model =
 
         FilterSelected filter ->
             ( { model | filters = [ filter ] }, Cmd.none )
+
+        AdjustmentSelected adjustment ->
+            ( { model | adjustment = Just adjustment }, Cmd.none )
 
 
 send : msg -> Cmd msg

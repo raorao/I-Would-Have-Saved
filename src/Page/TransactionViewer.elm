@@ -17,25 +17,73 @@ view model =
     in
         div []
             [ h2 [] [ text "I Would Have Saved..." ]
-            , viewSavings model.filters transactions
+            , viewSavings model transactions
+            , viewAdjustmentSelector
             , viewCategorySelector transactions
             ]
 
 
-viewSavings : List Model.Filter -> List Model.Transaction -> Html Msg
-viewSavings filters transactions =
+viewSavings : Model.Model -> List Model.Transaction -> Html Msg
+viewSavings { filters, adjustment } transactions =
     transactions
-        |> TransactionReducer.savings filters
+        |> TransactionReducer.savings filters adjustment
         |> text
         |> List.singleton
         |> div []
+
+
+viewAdjustmentSelector : Html Msg
+viewAdjustmentSelector =
+    div
+        []
+        [ label [] [ text "If I Spent " ], viewAdjustmentDropdown ]
+
+
+viewAdjustmentDropdown : Html Msg
+viewAdjustmentDropdown =
+    Dropdown.dropdown
+        (Dropdown.Options
+            adjustmentDropdownItems
+            (Just (Dropdown.Item "Adjustment" "Adjustment" False))
+            selectAdjustment
+        )
+        []
+        (Just "Adjustment")
+
+
+adjustmentDropdownItems : List Dropdown.Item
+adjustmentDropdownItems =
+    let
+        options =
+            [ "10% less", "25% less", "half as much", "nothing" ]
+    in
+        List.map enabledDropdownItem options
+
+
+selectAdjustment : Maybe String -> Update.Msg
+selectAdjustment selection =
+    case selection of
+        Just "10% less" ->
+            Update.AdjustmentSelected (Model.Adjustment 0.1)
+
+        Just "25% less" ->
+            Update.AdjustmentSelected (Model.Adjustment 0.25)
+
+        Just "half as much" ->
+            Update.AdjustmentSelected (Model.Adjustment 0.5)
+
+        Just "nothing" ->
+            Update.AdjustmentSelected (Model.Adjustment 1.0)
+
+        _ ->
+            Update.NoOp
 
 
 viewCategorySelector : List Model.Transaction -> Html Msg
 viewCategorySelector transactions =
     div
         []
-        [ label [] [ text "Category" ], viewCategoryDropdown transactions ]
+        [ label [] [ text "On " ], viewCategoryDropdown transactions ]
 
 
 viewCategoryDropdown : List Model.Transaction -> Html Msg
@@ -47,19 +95,19 @@ viewCategoryDropdown transactions =
             selectCategory
         )
         []
-        (Just "Category ")
+        (Just "Category")
 
 
 categoryDropdownItems : List Model.Transaction -> List Dropdown.Item
 categoryDropdownItems transactions =
     transactions
         |> TransactionReducer.categories
-        |> List.map categoryDropdownItem
+        |> List.map enabledDropdownItem
 
 
-categoryDropdownItem : String -> Dropdown.Item
-categoryDropdownItem category =
-    Dropdown.Item category category True
+enabledDropdownItem : String -> Dropdown.Item
+enabledDropdownItem str =
+    Dropdown.Item str str True
 
 
 selectCategory : Maybe String -> Update.Msg

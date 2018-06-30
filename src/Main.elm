@@ -29,6 +29,7 @@ init config location =
           , transactions = RemoteData.NotAsked
           , budgets = RemoteData.NotAsked
           , filters = []
+          , adjustment = Nothing
           }
         , cmd
         )

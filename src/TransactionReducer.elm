@@ -4,12 +4,14 @@ import Model exposing (..)
 import List.Extra
 
 
-savings : List Filter -> List Transaction -> String
-savings filters transactions =
+savings : List Filter -> Maybe Adjustment -> List Transaction -> String
+savings filters adjustment transactions =
     transactions
         |> List.filter (applyFilters filters)
         |> List.map .amount
         |> List.sum
+        |> toFloat
+        |> applyAdjustment adjustment
         |> format
 
 
@@ -21,11 +23,21 @@ categories transactions =
         |> List.sort
 
 
-format : Int -> String
+applyAdjustment : Maybe Adjustment -> Float -> Float
+applyAdjustment adjustment currentSavings =
+    case adjustment of
+        Just (Adjustment val) ->
+            val * currentSavings
+
+        Nothing ->
+            currentSavings
+
+
+format : Float -> String
 format amount =
     let
         inDollars =
-            -(toFloat amount) / 1000.0
+            -amount / 1000.0
     in
         "$" ++ (toString inDollars)
 
