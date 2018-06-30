@@ -44,16 +44,28 @@ update msg model =
                     in
                         ( { model | budgets = RemoteData.Loading }, requestCmd )
 
-        BudgetsFetched (Ok a) ->
-            ( { model
-                | budgets = RemoteData.Success a
-                , page = Model.BudgetSelector
-              }
-            , Cmd.none
-            )
+        BudgetsFetched (Ok budgets) ->
+            let
+                ( page, cmd ) =
+                    case Zipper.toList budgets of
+                        [] ->
+                            ( Model.Error, Cmd.none )
 
-        BudgetsFetched (Err e) ->
-            ( { model | budgets = RemoteData.Failure e }, Cmd.none )
+                        [ _ ] ->
+                            ( Model.Loading, send FetchTransactions )
+
+                        _ ->
+                            ( Model.BudgetSelector, Cmd.none )
+            in
+                ( { model
+                    | budgets = RemoteData.Success budgets
+                    , page = page
+                  }
+                , Cmd.none
+                )
+
+        BudgetsFetched (Err error) ->
+            ( { model | budgets = RemoteData.Failure error }, Cmd.none )
 
         SelectBudget budget ->
             let
@@ -89,16 +101,16 @@ update msg model =
                     in
                         ( { model | transactions = RemoteData.Loading }, requestCmd )
 
-        TransactionsFetched (Ok a) ->
+        TransactionsFetched (Ok transactions) ->
             ( { model
-                | transactions = RemoteData.Success a
+                | transactions = RemoteData.Success transactions
                 , page = Model.TransactionViewer
               }
             , Cmd.none
             )
 
-        TransactionsFetched (Err e) ->
-            ( { model | transactions = RemoteData.Failure e }, Cmd.none )
+        TransactionsFetched (Err error) ->
+            ( { model | transactions = RemoteData.Failure error }, Cmd.none )
 
         CategorySelected categoryFilter ->
             let
