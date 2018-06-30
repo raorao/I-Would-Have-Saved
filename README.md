@@ -30,4 +30,10 @@ elm-app start
 
 Your browser should now open to up to a working version of the site.
 
+5. visit /sign_in
 
+You will be prompted to connect to YNAB. authorize the application, and copy `?access_token=<<token>>` value from the URL.
+
+6. visit `/home?access_token=<<token>>`
+
+You should now see a working version of the site.
