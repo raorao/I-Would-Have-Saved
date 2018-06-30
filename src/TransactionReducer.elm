@@ -23,6 +23,8 @@ categories transactions =
         |> List.map .category
         |> List.filterMap identity
         |> List.Extra.unique
+        |> List.filter ((/=) "Immediate Income SubCategory")
+        |> List.filter ((/=) "Split (Multiple Categories)...")
         |> List.sort
 
 
