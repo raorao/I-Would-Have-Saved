@@ -65,8 +65,8 @@ type alias Model =
     }
 
 
-type alias AccessToken =
-    String
+type AccessToken
+    = AccessToken String
 
 
 type alias BudgetId =

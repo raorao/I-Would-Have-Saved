@@ -2,13 +2,13 @@ module Ynab exposing (fetchBudgets, fetchTransactions)
 
 import Json.Decode as Decode
 import Http exposing (..)
-import Model exposing (Budget, AccessToken, BudgetId, Transaction)
+import Model exposing (Budget, AccessToken(..), BudgetId, Transaction)
 import List.Zipper as Zipper exposing (Zipper)
 import Date exposing (Date)
 import Result exposing (..)
 
 
-fetchBudgets : String -> Request (Zipper Budget)
+fetchBudgets : AccessToken -> Request (Zipper Budget)
 fetchBudgets token =
     fetchBudgetsDecoder
         |> Http.get (fetchBudgetsUrl token)
@@ -20,7 +20,7 @@ fetchTransactions token budgetId =
 
 
 fetchTransactionsUrl : AccessToken -> BudgetId -> String
-fetchTransactionsUrl token budgetId =
+fetchTransactionsUrl (AccessToken token) budgetId =
     "https://api.youneedabudget.com/v1/budgets/"
         ++ budgetId
         ++ "/transactions?access_token="
@@ -60,8 +60,8 @@ decodeDate =
             |> Decode.andThen (decodeDateOrFail)
 
 
-fetchBudgetsUrl : String -> String
-fetchBudgetsUrl token =
+fetchBudgetsUrl : AccessToken -> String
+fetchBudgetsUrl (AccessToken token) =
     "https://api.youneedabudget.com/v1/budgets?access_token=" ++ token
 
 

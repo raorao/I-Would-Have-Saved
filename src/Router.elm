@@ -36,3 +36,4 @@ parseAccessToken location =
             |> Maybe.map .submatches
             |> Maybe.andThen List.head
             |> Maybe.andThen identity
+            |> Maybe.map (Model.AccessToken)
