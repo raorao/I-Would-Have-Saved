@@ -2,7 +2,7 @@ module Ynab exposing (fetchBudgets, fetchTransactions)
 
 import Json.Decode as Decode
 import Http exposing (..)
-import Model exposing (Budget, AccessToken(..), BudgetId, Transaction)
+import Model exposing (Budget, AccessToken(..), BudgetId(..), Transaction)
 import List.Zipper as Zipper exposing (Zipper)
 import Date exposing (Date)
 import Result exposing (..)
@@ -20,7 +20,7 @@ fetchTransactions token budgetId =
 
 
 fetchTransactionsUrl : AccessToken -> BudgetId -> String
-fetchTransactionsUrl (AccessToken token) budgetId =
+fetchTransactionsUrl (AccessToken token) (BudgetId budgetId) =
     "https://api.youneedabudget.com/v1/budgets/"
         ++ budgetId
         ++ "/transactions?access_token="
@@ -78,7 +78,9 @@ fetchBudgetsDecoder =
 
 budgetDecoder : Decode.Decoder Budget
 budgetDecoder =
-    Decode.map2 Budget (Decode.field "id" Decode.string) (Decode.field "name" Decode.string)
+    Decode.map2 Budget
+        (Decode.field "id" (Decode.map BudgetId Decode.string))
+        (Decode.field "name" Decode.string)
 
 
 ensureAtLeastOne : Maybe (Zipper Budget) -> Decode.Decoder (Zipper Budget)

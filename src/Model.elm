@@ -69,8 +69,8 @@ type AccessToken
     = AccessToken String
 
 
-type alias BudgetId =
-    String
+type BudgetId
+    = BudgetId String
 
 
 type alias Budget =
@@ -95,4 +95,4 @@ emptyFilters =
 
 defaultBudget : Budget
 defaultBudget =
-    Budget "default" "default"
+    Budget (BudgetId "default") "default"
