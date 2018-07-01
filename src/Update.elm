@@ -131,8 +131,8 @@ update msg model =
                 newPageData =
                     { pageData | filters = newFilters, datePicker = newDatePicker }
             in
-                ({ model | page = TransactionViewer newPageData }
-                    ! [ Cmd.map SetDatePicker datePickerCmd ]
+                ( { model | page = TransactionViewer newPageData }
+                , Cmd.map SetDatePicker datePickerCmd
                 )
 
         _ ->
