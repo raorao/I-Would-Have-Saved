@@ -1,4 +1,4 @@
-# I Would Have Spent
+# I Would Have Saved
 
 Application for learning from your YNAB transaction history.
 
