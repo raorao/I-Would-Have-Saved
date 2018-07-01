@@ -19,8 +19,12 @@ parseError errorType =
         NoAccessToken ->
             text "Could not find access token. Try connecting to YNAB again."
 
-        ApiDown ->
-            text "We're having trouble contacting YNAB. Sorry!"
+        ApiDown error ->
+            let
+                _ =
+                    Debug.log "api error" error
+            in
+                text "We're having trouble contacting YNAB. Try connecting to YNAB again."
 
         InvalidRoute ->
             text "Something in your browser is funky. Try connecting to YNAB again."

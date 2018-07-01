@@ -19,8 +19,8 @@ view model =
         Loading message ->
             Page.Loading.view message
 
-        BudgetSelector ->
-            Page.BudgetSelector.view model
+        BudgetSelector pageData ->
+            Page.BudgetSelector.view pageData
 
         TransactionViewer pageData ->
             Page.TransactionViewer.view pageData

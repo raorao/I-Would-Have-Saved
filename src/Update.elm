@@ -1,7 +1,6 @@
 module Update exposing (..)
 
 import Model
-import RemoteData
 import Http
 import Ynab
 import List.Zipper as Zipper exposing (Zipper)
@@ -16,7 +15,7 @@ type Msg
     = NoOp
     | FetchBudgets
     | BudgetsFetched (Result Http.Error (Zipper Model.Budget))
-    | FetchTransactions
+    | FetchTransactions Model.BudgetId
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
     | CategorySelected Model.CategoryFilter
@@ -43,8 +42,7 @@ update msg model =
                                 |> Http.send BudgetsFetched
                     in
                         ( { model
-                            | budgets = RemoteData.Loading
-                            , page = Model.Loading "Loading Budgets..."
+                            | page = Model.Loading "Loading Budgets..."
                           }
                         , requestCmd
                         )
@@ -56,51 +54,49 @@ update msg model =
                         [] ->
                             ( Model.Error Model.ImpossibleState, Cmd.none )
 
-                        [ _ ] ->
+                        [ budget ] ->
                             ( Model.Loading "Loading Transactions..."
-                            , send FetchTransactions
+                            , send (FetchTransactions budget.id)
                             )
 
                         _ ->
-                            ( Model.BudgetSelector, Cmd.none )
+                            ( Model.BudgetSelector { budgets = budgets }, Cmd.none )
             in
-                ( { model
-                    | budgets = RemoteData.Success budgets
-                    , page = page
-                  }
-                , cmd
-                )
+                ( { model | page = page }, cmd )
 
         BudgetsFetched (Err error) ->
-            ( { model
-                | budgets = RemoteData.Failure error
-                , page = Model.Error Model.ApiDown
-              }
+            ( { model | page = Model.Error (Model.ApiDown error) }
             , Cmd.none
             )
 
         SelectBudget budget ->
-            let
-                newBudgets =
-                    case model.budgets of
-                        RemoteData.Success budgets ->
-                            budgets
+            case model.page of
+                Model.BudgetSelector pageData ->
+                    let
+                        maybeBudgetId =
+                            pageData
+                                |> .budgets
                                 |> Zipper.first
                                 |> Zipper.find (\b -> b.name == budget.name)
-                                |> Maybe.withDefault budgets
-                                |> RemoteData.Success
+                                |> Maybe.map Zipper.current
+                                |> Maybe.map .id
 
-                        _ ->
-                            model.budgets
-            in
-                ( { model
-                    | budgets = newBudgets
-                    , page = Model.Loading "Loading Transactions..."
-                  }
-                , send FetchTransactions
-                )
+                        ( page, cmd ) =
+                            case maybeBudgetId of
+                                Just budgetId ->
+                                    ( Model.Loading "Loading Transactions..."
+                                    , send (FetchTransactions budgetId)
+                                    )
 
-        FetchTransactions ->
+                                Nothing ->
+                                    ( Model.Error Model.ImpossibleState, Cmd.none )
+                    in
+                        ( { model | page = page }, cmd )
+
+                _ ->
+                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+
+        FetchTransactions budgetId ->
             case model.token of
                 Nothing ->
                     ( { model | page = Model.Error Model.NoAccessToken }
@@ -110,13 +106,8 @@ update msg model =
                 Just token ->
                     let
                         requestCmd =
-                            model.budgets
-                                |> RemoteData.toMaybe
-                                |> Maybe.map Zipper.current
-                                |> Maybe.map .id
-                                |> Maybe.map (Ynab.fetchTransactions token)
-                                |> Maybe.map (Http.send TransactionsFetched)
-                                |> Maybe.withDefault Cmd.none
+                            Ynab.fetchTransactions token budgetId
+                                |> Http.send TransactionsFetched
                     in
                         ( { model
                             | page = Model.Loading "Loading Transactions..."
@@ -143,7 +134,7 @@ update msg model =
 
         TransactionsFetched (Err error) ->
             ( { model
-                | page = Model.Error Model.ApiDown
+                | page = Model.Error (Model.ApiDown error)
               }
             , Cmd.none
             )

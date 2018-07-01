@@ -5,21 +5,15 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Update
-import RemoteData
 import List.Zipper as Zipper
 
 
-view : Model.Model -> Html Update.Msg
-view model =
-    case model.budgets of
-        RemoteData.Success budgets ->
-            div []
-                [ h2 [] [ text "Select Your Budget" ]
-                , fieldset [] (viewRadioButtons budgets)
-                ]
-
-        _ ->
-            text "uh oh"
+view : Model.BudgetSelectorData -> Html Update.Msg
+view { budgets } =
+    div []
+        [ h2 [] [ text "Select Your Budget" ]
+        , fieldset [] (viewRadioButtons budgets)
+        ]
 
 
 

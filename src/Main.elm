@@ -28,7 +28,6 @@ init config location =
         ( { config = config
           , page = page
           , token = Router.parseAccessToken location
-          , budgets = RemoteData.NotAsked
           }
         , cmd
         )

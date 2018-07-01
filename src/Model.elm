@@ -1,10 +1,9 @@
 module Model exposing (..)
 
-import RemoteData exposing (..)
-import Http
 import List.Zipper exposing (Zipper)
 import Date exposing (Date)
 import DatePicker
+import Http
 
 
 type alias Config =
@@ -15,7 +14,7 @@ type alias Config =
 
 type ErrorType
     = NoAccessToken
-    | ApiDown
+    | ApiDown Http.Error
     | InvalidRoute
     | ImpossibleState
 
@@ -27,9 +26,14 @@ type alias TransactionViewerData =
     }
 
 
+type alias BudgetSelectorData =
+    { budgets : Zipper Budget
+    }
+
+
 type Page
     = Loading String
-    | BudgetSelector
+    | BudgetSelector BudgetSelectorData
     | TransactionViewer TransactionViewerData
     | LoggedOut
     | Error ErrorType
@@ -43,6 +47,10 @@ type SinceFilter
     = SinceFilter Date
 
 
+type Adjustment
+    = Adjustment Float
+
+
 type alias Filters =
     { category : Maybe CategoryFilter
     , since : Maybe SinceFilter
@@ -50,15 +58,10 @@ type alias Filters =
     }
 
 
-type Adjustment
-    = Adjustment Float
-
-
 type alias Model =
     { config : Config
     , page : Page
     , token : Maybe AccessToken
-    , budgets : RemoteData Http.Error (Zipper Budget)
     }
 
 
