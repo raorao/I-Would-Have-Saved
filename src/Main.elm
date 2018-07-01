@@ -17,23 +17,22 @@ init config location =
             DatePicker.init
                 |> Tuple.mapSecond (Cmd.map SetDatePicker)
 
-        ( page, token, cmd ) =
+        ( page, cmd ) =
             case Router.parseLocation location of
                 Just Router.LoggedOut ->
-                    ( Model.LoggedOut, Nothing, Cmd.none )
+                    ( Model.LoggedOut, Cmd.none )
 
-                Just (Router.Loading maybeToken) ->
+                Just Router.LoggedIn ->
                     ( Model.Loading "Loading Budgets..."
-                    , maybeToken
                     , (send FetchBudgets)
                     )
 
                 Nothing ->
-                    ( Model.Error Model.InvalidRoute, Nothing, Cmd.none )
+                    ( Model.Error Model.InvalidRoute, Cmd.none )
     in
         ( { config = config
           , page = page
-          , token = token
+          , token = Router.parseAccessToken location
           , transactions = RemoteData.NotAsked
           , budgets = RemoteData.NotAsked
           , filters = Model.emptyFilters
