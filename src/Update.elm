@@ -3,7 +3,6 @@ module Update exposing (..)
 import Model
 import Http
 import Ynab
-import List.Zipper as Zipper exposing (Zipper)
 import Task
 import DatePicker
 
@@ -14,7 +13,7 @@ import DatePicker
 type Msg
     = NoOp
     | FetchBudgets Model.AccessToken
-    | BudgetsFetched Model.AccessToken (Result Http.Error (Zipper Model.Budget))
+    | BudgetsFetched Model.AccessToken (Result Http.Error (List Model.Budget))
     | FetchTransactions Model.AccessToken Model.BudgetId
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
@@ -45,7 +44,7 @@ update msg model =
         BudgetsFetched token (Ok budgets) ->
             let
                 ( page, cmd ) =
-                    case Zipper.toList budgets of
+                    case budgets of
                         [] ->
                             ( Model.Error Model.ImpossibleState, Cmd.none )
 
@@ -71,26 +70,10 @@ update msg model =
 
         SelectBudget budget ->
             case model.page of
-                Model.BudgetSelector { token, budgets } ->
-                    let
-                        maybeBudgetId =
-                            budgets
-                                |> Zipper.first
-                                |> Zipper.find (\b -> b.name == budget.name)
-                                |> Maybe.map Zipper.current
-                                |> Maybe.map .id
-
-                        ( page, cmd ) =
-                            case maybeBudgetId of
-                                Just budgetId ->
-                                    ( Model.Loading "Loading Transactions..."
-                                    , send (FetchTransactions token budgetId)
-                                    )
-
-                                Nothing ->
-                                    ( Model.Error Model.ImpossibleState, Cmd.none )
-                    in
-                        ( { model | page = page }, cmd )
+                Model.BudgetSelector { token } ->
+                    ( { model | page = Model.Loading "Loading Transactions..." }
+                    , send (FetchTransactions token budget.id)
+                    )
 
                 _ ->
                     ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )

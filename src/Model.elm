@@ -1,6 +1,5 @@
 module Model exposing (..)
 
-import List.Zipper exposing (Zipper)
 import Date exposing (Date)
 import DatePicker
 import Http
@@ -27,7 +26,7 @@ type alias TransactionViewerData =
 
 
 type alias BudgetSelectorData =
-    { budgets : Zipper Budget
+    { budgets : List Budget
     , token : AccessToken
     }
 
@@ -91,8 +90,3 @@ type alias Transaction =
 emptyFilters : Filters
 emptyFilters =
     Filters Nothing Nothing Nothing
-
-
-defaultBudget : Budget
-defaultBudget =
-    Budget (BudgetId "default") "default"

@@ -3,12 +3,11 @@ module Ynab exposing (fetchBudgets, fetchTransactions)
 import Json.Decode as Decode
 import Http exposing (..)
 import Model exposing (Budget, AccessToken(..), BudgetId(..), Transaction)
-import List.Zipper as Zipper exposing (Zipper)
 import Date exposing (Date)
 import Result exposing (..)
 
 
-fetchBudgets : AccessToken -> Request (Zipper Budget)
+fetchBudgets : AccessToken -> Request (List Budget)
 fetchBudgets token =
     fetchBudgetsDecoder
         |> Http.get (fetchBudgetsUrl token)
@@ -65,14 +64,12 @@ fetchBudgetsUrl (AccessToken token) =
     "https://api.youneedabudget.com/v1/budgets?access_token=" ++ token
 
 
-fetchBudgetsDecoder : Decode.Decoder (Zipper Budget)
+fetchBudgetsDecoder : Decode.Decoder (List Budget)
 fetchBudgetsDecoder =
     budgetDecoder
         |> Decode.list
         |> Decode.field "budgets"
         |> Decode.field "data"
-        |> Decode.map addDefaultBudgetIfNecessary
-        |> Decode.map Zipper.fromList
         |> Decode.andThen ensureAtLeastOne
 
 
@@ -83,19 +80,11 @@ budgetDecoder =
         (Decode.field "name" Decode.string)
 
 
-ensureAtLeastOne : Maybe (Zipper Budget) -> Decode.Decoder (Zipper Budget)
-ensureAtLeastOne maybeZipper =
-    case maybeZipper of
-        Just zipper ->
-            Decode.succeed zipper
-
-        Nothing ->
+ensureAtLeastOne : List Budget -> Decode.Decoder (List Budget)
+ensureAtLeastOne budgets =
+    case budgets of
+        [] ->
             Decode.fail "must have at least one budget."
 
-
-addDefaultBudgetIfNecessary : List Budget -> List Budget
-addDefaultBudgetIfNecessary budgets =
-    if List.length budgets > 1 then
-        [ Model.defaultBudget ] ++ budgets
-    else
-        budgets
+        _ ->
+            Decode.succeed budgets
