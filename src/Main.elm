@@ -7,16 +7,11 @@ import Update exposing (Msg(..))
 import View
 import Task
 import RemoteData
-import DatePicker
 
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
 init config location =
     let
-        ( datePicker, datePickerCmd ) =
-            DatePicker.init
-                |> Tuple.mapSecond (Cmd.map SetDatePicker)
-
         ( page, cmd ) =
             case Router.parseLocation location of
                 Just Router.LoggedOut ->
@@ -33,12 +28,9 @@ init config location =
         ( { config = config
           , page = page
           , token = Router.parseAccessToken location
-          , transactions = RemoteData.NotAsked
           , budgets = RemoteData.NotAsked
-          , filters = Model.emptyFilters
-          , datePicker = datePicker
           }
-        , Cmd.batch [ cmd, datePickerCmd ]
+        , cmd
         )
 
 

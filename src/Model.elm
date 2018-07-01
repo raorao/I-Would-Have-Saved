@@ -20,10 +20,17 @@ type ErrorType
     | ImpossibleState
 
 
+type alias TransactionViewerData =
+    { transactions : List Transaction
+    , filters : Filters
+    , datePicker : DatePicker.DatePicker
+    }
+
+
 type Page
     = Loading String
     | BudgetSelector
-    | TransactionViewer
+    | TransactionViewer TransactionViewerData
     | LoggedOut
     | Error ErrorType
 
@@ -52,9 +59,6 @@ type alias Model =
     , page : Page
     , token : Maybe AccessToken
     , budgets : RemoteData Http.Error (Zipper Budget)
-    , transactions : RemoteData Http.Error (List Transaction)
-    , filters : Filters
-    , datePicker : DatePicker.DatePicker
     }
 
 

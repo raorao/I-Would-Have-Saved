@@ -3,27 +3,21 @@ module Page.TransactionViewer exposing (..)
 import Model
 import Html exposing (..)
 import Update exposing (Msg)
-import RemoteData exposing (RemoteData)
 import TransactionReducer
 import Dropdown
 import DatePicker
 import Round
 
 
-view : Model.Model -> Html Msg
-view model =
-    let
-        transactions =
-            model.transactions
-                |> RemoteData.withDefault []
-    in
-        div []
-            [ h2 [] [ text "I Would Have Saved..." ]
-            , viewSavings model.filters transactions
-            , viewAdjustmentSelector
-            , viewCategorySelector transactions
-            , viewSinceSelector model
-            ]
+view : Model.TransactionViewerData -> Html Msg
+view { filters, datePicker, transactions } =
+    div []
+        [ h2 [] [ text "I Would Have Saved..." ]
+        , viewSavings filters transactions
+        , viewAdjustmentSelector
+        , viewCategorySelector transactions
+        , viewSinceSelector datePicker filters
+        ]
 
 
 viewSavings : Model.Filters -> List Model.Transaction -> Html Msg
@@ -125,11 +119,11 @@ selectCategory selection =
             Update.NoOp
 
 
-viewSinceSelector : Model.Model -> Html Update.Msg
-viewSinceSelector model =
+viewSinceSelector : DatePicker.DatePicker -> Model.Filters -> Html Update.Msg
+viewSinceSelector datePicker filters =
     div []
         [ text "Since "
-        , viewSinceDatePicker model.datePicker model.filters.since
+        , viewSinceDatePicker datePicker filters.since
         ]
 
 

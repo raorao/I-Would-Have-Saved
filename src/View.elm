@@ -22,8 +22,8 @@ view model =
         BudgetSelector ->
             Page.BudgetSelector.view model
 
-        TransactionViewer ->
-            Page.TransactionViewer.view model
+        TransactionViewer pageData ->
+            Page.TransactionViewer.view pageData
 
         Error errorType ->
             Page.ErrorView.view errorType

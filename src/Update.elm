@@ -103,7 +103,9 @@ update msg model =
         FetchTransactions ->
             case model.token of
                 Nothing ->
-                    ( { model | page = Model.Error Model.NoAccessToken }, Cmd.none )
+                    ( { model | page = Model.Error Model.NoAccessToken }
+                    , Cmd.none
+                    )
 
                 Just token ->
                     let
@@ -117,72 +119,130 @@ update msg model =
                                 |> Maybe.withDefault Cmd.none
                     in
                         ( { model
-                            | transactions = RemoteData.Loading
-                            , page = Model.Loading "Loading Transactions..."
+                            | page = Model.Loading "Loading Transactions..."
                           }
                         , requestCmd
                         )
 
         TransactionsFetched (Ok transactions) ->
-            ( { model
-                | transactions = RemoteData.Success transactions
-                , page = Model.TransactionViewer
-              }
-            , Cmd.none
-            )
+            let
+                ( datePicker, datePickerCmd ) =
+                    DatePicker.init
+                        |> Tuple.mapSecond (Cmd.map SetDatePicker)
+            in
+                ( { model
+                    | page =
+                        Model.TransactionViewer
+                            { transactions = transactions
+                            , datePicker = datePicker
+                            , filters = Model.emptyFilters
+                            }
+                  }
+                , datePickerCmd
+                )
 
         TransactionsFetched (Err error) ->
             ( { model
-                | transactions = RemoteData.Failure error
-                , page = Model.Error Model.ApiDown
+                | page = Model.Error Model.ApiDown
               }
             , Cmd.none
             )
 
         CategorySelected categoryFilter ->
-            let
-                filters =
-                    model.filters
+            case model.page of
+                Model.TransactionViewer pageData ->
+                    let
+                        filters =
+                            pageData.filters
 
-                newFilters =
-                    { filters | category = Just categoryFilter }
-            in
-                ( { model | filters = newFilters }, Cmd.none )
+                        newFilters =
+                            { filters | category = Just categoryFilter }
+
+                        newPageData =
+                            { pageData | filters = newFilters }
+                    in
+                        ( { model | page = Model.TransactionViewer newPageData }
+                        , Cmd.none
+                        )
+
+                _ ->
+                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
 
         AdjustmentSelected adjustmentFilter ->
-            let
-                filters =
-                    model.filters
+            case model.page of
+                Model.TransactionViewer pageData ->
+                    let
+                        filters =
+                            pageData.filters
 
-                newFilters =
-                    { filters | adjustment = Just adjustmentFilter }
-            in
-                ( { model | filters = newFilters }, Cmd.none )
+                        newFilters =
+                            { filters | adjustment = Just adjustmentFilter }
+
+                        newPageData =
+                            { pageData | filters = newFilters }
+                    in
+                        ( { model | page = Model.TransactionViewer newPageData }
+                        , Cmd.none
+                        )
+
+                _ ->
+                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
 
         SetDatePicker msg ->
-            let
-                ( newDatePicker, datePickerCmd, dateEvent ) =
-                    DatePicker.update DatePicker.defaultSettings msg model.datePicker
+            case model.page of
+                Model.TransactionViewer pageData ->
+                    let
+                        ( newDatePicker, datePickerCmd, dateEvent ) =
+                            DatePicker.update
+                                DatePicker.defaultSettings
+                                msg
+                                pageData.datePicker
 
-                date =
-                    case dateEvent of
-                        DatePicker.Changed (Just newDate) ->
-                            Just (Model.SinceFilter newDate)
+                        date =
+                            case dateEvent of
+                                DatePicker.Changed (Just newDate) ->
+                                    Just (Model.SinceFilter newDate)
 
-                        _ ->
-                            Nothing
+                                _ ->
+                                    Nothing
 
-                filters =
-                    model.filters
+                        filters =
+                            pageData.filters
 
-                newFilters =
-                    { filters | since = date }
-            in
-                { model
-                    | datePicker = newDatePicker
-                    , filters = newFilters
-                }
-                    ! [ Cmd.map SetDatePicker datePickerCmd ]
+                        newFilters =
+                            { filters | since = date }
+
+                        newPageData =
+                            { pageData | filters = newFilters }
+                    in
+                        ({ model | page = Model.TransactionViewer newPageData }
+                            ! [ Cmd.map SetDatePicker datePickerCmd ]
+                        )
+
+                _ ->
+                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+
+
+
+--let
+--    ( newDatePicker, datePickerCmd, dateEvent ) =
+--        DatePicker.update DatePicker.defaultSettings msg model.datePicker
+--    date =
+--        case dateEvent of
+--            DatePicker.Changed (Just newDate) ->
+--                Just (Model.SinceFilter newDate)
+--            _ ->
+--                Nothing
+--    filters =
+--        model.filters
+--    newFilters =
+--        { filters | since = date }
+--in
+--    { model
+--        | datePicker = newDatePicker
+--        , filters = newFilters
+--    }
+--        ! [ Cmd.map SetDatePicker datePickerCmd ]
 
 
 send : msg -> Cmd msg
