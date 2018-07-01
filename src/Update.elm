@@ -1,6 +1,6 @@
 module Update exposing (..)
 
-import Model
+import Model exposing (..)
 import Http
 import Ynab
 import Task
@@ -12,85 +12,46 @@ import DatePicker
 
 type Msg
     = NoOp
-    | FetchBudgets Model.AccessToken
-    | BudgetsFetched Model.AccessToken (Result Http.Error (List Model.Budget))
-    | FetchTransactions Model.AccessToken Model.BudgetId
-    | TransactionsFetched (Result Http.Error (List Model.Transaction))
-    | SelectBudget Model.Budget
-    | CategorySelected Model.CategoryFilter
-    | AdjustmentSelected Model.Adjustment
+    | FetchBudgets AccessToken
+    | BudgetsFetched AccessToken (Result Http.Error (List Budget))
+    | FetchTransactions AccessToken BudgetId
+    | TransactionsFetched (Result Http.Error (List Transaction))
+    | SelectBudget Budget
+    | CategorySelected CategoryFilter
+    | AdjustmentSelected Adjustment
     | SetDatePicker DatePicker.Msg
 
 
-update : Msg -> Model.Model -> ( Model.Model, Cmd Msg )
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        NoOp ->
-            ( model, Cmd.none )
+    case ( model.page, msg ) of
+        ( Loading _, FetchBudgets token ) ->
+            ( { model | page = Loading "Loading Budgets..." }
+            , Http.send (BudgetsFetched token) (Ynab.fetchBudgets token)
+            )
 
-        FetchBudgets token ->
-            let
-                requestCmd =
-                    token
-                        |> Ynab.fetchBudgets
-                        |> Http.send (BudgetsFetched token)
-            in
-                ( { model
-                    | page = Model.Loading "Loading Budgets..."
-                  }
-                , requestCmd
-                )
+        ( Loading _, BudgetsFetched token (Ok []) ) ->
+            ( { model | page = Error ImpossibleState }, Cmd.none )
 
-        BudgetsFetched token (Ok budgets) ->
-            let
-                ( page, cmd ) =
-                    case budgets of
-                        [] ->
-                            ( Model.Error Model.ImpossibleState, Cmd.none )
+        ( Loading _, BudgetsFetched token (Ok [ budget ]) ) ->
+            ( { model | page = Loading "Loading Transactions..." }
+            , send (FetchTransactions token budget.id)
+            )
 
-                        [ budget ] ->
-                            ( Model.Loading "Loading Transactions..."
-                            , send (FetchTransactions token budget.id)
-                            )
-
-                        _ ->
-                            ( Model.BudgetSelector
-                                { budgets = budgets
-                                , token = token
-                                }
-                            , Cmd.none
-                            )
-            in
-                ( { model | page = page }, cmd )
-
-        BudgetsFetched token (Err error) ->
-            ( { model | page = Model.Error (Model.ApiDown error) }
+        ( Loading _, BudgetsFetched token (Ok budgets) ) ->
+            ( { model | page = (BudgetSelector { budgets = budgets, token = token }) }
             , Cmd.none
             )
 
-        SelectBudget budget ->
-            case model.page of
-                Model.BudgetSelector { token } ->
-                    ( { model | page = Model.Loading "Loading Transactions..." }
-                    , send (FetchTransactions token budget.id)
-                    )
+        ( Loading _, BudgetsFetched token (Err error) ) ->
+            ( { model | page = Error (ApiDown error) }, Cmd.none )
 
-                _ ->
-                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+        ( Loading _, FetchTransactions token budgetId ) ->
+            ( { model | page = Loading "Loading Transactions..." }
+            , Http.send TransactionsFetched (Ynab.fetchTransactions token budgetId)
+            )
 
-        FetchTransactions token budgetId ->
-            let
-                requestCmd =
-                    Ynab.fetchTransactions token budgetId
-                        |> Http.send TransactionsFetched
-            in
-                ( { model
-                    | page = Model.Loading "Loading Transactions..."
-                  }
-                , requestCmd
-                )
-
-        TransactionsFetched (Ok transactions) ->
+        ( Loading _, TransactionsFetched (Ok transactions) ) ->
             let
                 ( datePicker, datePickerCmd ) =
                     DatePicker.init
@@ -98,95 +59,84 @@ update msg model =
             in
                 ( { model
                     | page =
-                        Model.TransactionViewer
+                        TransactionViewer
                             { transactions = transactions
                             , datePicker = datePicker
-                            , filters = Model.emptyFilters
+                            , filters = emptyFilters
                             }
                   }
                 , datePickerCmd
                 )
 
-        TransactionsFetched (Err error) ->
-            ( { model
-                | page = Model.Error (Model.ApiDown error)
-              }
-            , Cmd.none
+        ( Loading _, TransactionsFetched (Err error) ) ->
+            ( { model | page = Error (ApiDown error) }, Cmd.none )
+
+        ( BudgetSelector pageData, SelectBudget budget ) ->
+            ( { model | page = Loading "Loading Transactions..." }
+            , send (FetchTransactions pageData.token budget.id)
             )
 
-        CategorySelected categoryFilter ->
-            case model.page of
-                Model.TransactionViewer pageData ->
-                    let
-                        filters =
-                            pageData.filters
+        ( TransactionViewer pageData, CategorySelected categoryFilter ) ->
+            let
+                filters =
+                    pageData.filters
 
-                        newFilters =
-                            { filters | category = Just categoryFilter }
+                newFilters =
+                    { filters | category = Just categoryFilter }
 
-                        newPageData =
-                            { pageData | filters = newFilters }
-                    in
-                        ( { model | page = Model.TransactionViewer newPageData }
-                        , Cmd.none
-                        )
+                newPageData =
+                    { pageData | filters = newFilters }
+            in
+                ( { model | page = TransactionViewer newPageData }
+                , Cmd.none
+                )
 
-                _ ->
-                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+        ( TransactionViewer pageData, AdjustmentSelected adjustmentFilter ) ->
+            let
+                filters =
+                    pageData.filters
 
-        AdjustmentSelected adjustmentFilter ->
-            case model.page of
-                Model.TransactionViewer pageData ->
-                    let
-                        filters =
-                            pageData.filters
+                newFilters =
+                    { filters | adjustment = Just adjustmentFilter }
 
-                        newFilters =
-                            { filters | adjustment = Just adjustmentFilter }
+                newPageData =
+                    { pageData | filters = newFilters }
+            in
+                ( { model | page = TransactionViewer newPageData }
+                , Cmd.none
+                )
 
-                        newPageData =
-                            { pageData | filters = newFilters }
-                    in
-                        ( { model | page = Model.TransactionViewer newPageData }
-                        , Cmd.none
-                        )
+        ( TransactionViewer pageData, SetDatePicker msg ) ->
+            let
+                ( newDatePicker, datePickerCmd, dateEvent ) =
+                    DatePicker.update
+                        DatePicker.defaultSettings
+                        msg
+                        pageData.datePicker
 
-                _ ->
-                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+                date =
+                    case dateEvent of
+                        DatePicker.Changed (Just newDate) ->
+                            Just (SinceFilter newDate)
 
-        SetDatePicker msg ->
-            case model.page of
-                Model.TransactionViewer pageData ->
-                    let
-                        ( newDatePicker, datePickerCmd, dateEvent ) =
-                            DatePicker.update
-                                DatePicker.defaultSettings
-                                msg
-                                pageData.datePicker
+                        _ ->
+                            Nothing
 
-                        date =
-                            case dateEvent of
-                                DatePicker.Changed (Just newDate) ->
-                                    Just (Model.SinceFilter newDate)
+                filters =
+                    pageData.filters
 
-                                _ ->
-                                    Nothing
+                newFilters =
+                    { filters | since = date }
 
-                        filters =
-                            pageData.filters
+                newPageData =
+                    { pageData | filters = newFilters, datePicker = newDatePicker }
+            in
+                ({ model | page = TransactionViewer newPageData }
+                    ! [ Cmd.map SetDatePicker datePickerCmd ]
+                )
 
-                        newFilters =
-                            { filters | since = date }
-
-                        newPageData =
-                            { pageData | filters = newFilters }
-                    in
-                        ({ model | page = Model.TransactionViewer newPageData }
-                            ! [ Cmd.map SetDatePicker datePickerCmd ]
-                        )
-
-                _ ->
-                    ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
+        _ ->
+            ( { model | page = Error ImpossibleState }, Cmd.none )
 
 
 send : msg -> Cmd msg
