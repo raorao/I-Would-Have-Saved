@@ -68,7 +68,7 @@ update msg model =
                     | budgets = RemoteData.Success budgets
                     , page = page
                   }
-                , Cmd.none
+                , cmd
                 )
 
         BudgetsFetched (Err error) ->
