@@ -1,7 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html)
-import Model exposing (Page(..), Model)
+import Model exposing (Model(..))
 import Update exposing (Msg)
 import Page.Loading
 import Page.LoggedOut
@@ -11,8 +11,8 @@ import Page.ErrorView
 
 
 view : Model -> Html Msg
-view { page } =
-    case page of
+view model =
+    case model of
         LoggedOut config ->
             Page.LoggedOut.view config
 

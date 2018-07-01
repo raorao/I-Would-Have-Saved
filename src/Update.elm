@@ -24,30 +24,28 @@ type Msg
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case ( model.page, msg ) of
+    case ( model, msg ) of
         ( Loading _, FetchBudgets token ) ->
-            ( { model | page = Loading "Loading Budgets..." }
+            ( Loading "Loading Budgets..."
             , Http.send (BudgetsFetched token) (Ynab.fetchBudgets token)
             )
 
         ( Loading _, BudgetsFetched token (Ok []) ) ->
-            ( { model | page = Error ImpossibleState }, Cmd.none )
+            ( Error ImpossibleState, Cmd.none )
 
         ( Loading _, BudgetsFetched token (Ok [ budget ]) ) ->
-            ( { model | page = Loading "Loading Transactions..." }
+            ( Loading "Loading Transactions..."
             , send (FetchTransactions token budget.id)
             )
 
         ( Loading _, BudgetsFetched token (Ok budgets) ) ->
-            ( { model | page = (BudgetSelector { budgets = budgets, token = token }) }
-            , Cmd.none
-            )
+            ( BudgetSelector { budgets = budgets, token = token }, Cmd.none )
 
         ( Loading _, BudgetsFetched token (Err error) ) ->
-            ( { model | page = Error (ApiDown error) }, Cmd.none )
+            ( Error (ApiDown error), Cmd.none )
 
         ( Loading _, FetchTransactions token budgetId ) ->
-            ( { model | page = Loading "Loading Transactions..." }
+            ( Loading "Loading Transactions..."
             , Http.send TransactionsFetched (Ynab.fetchTransactions token budgetId)
             )
 
@@ -57,22 +55,19 @@ update msg model =
                     DatePicker.init
                         |> Tuple.mapSecond (Cmd.map SetDatePicker)
             in
-                ( { model
-                    | page =
-                        TransactionViewer
-                            { transactions = transactions
-                            , datePicker = datePicker
-                            , filters = emptyFilters
-                            }
-                  }
+                ( TransactionViewer
+                    { transactions = transactions
+                    , datePicker = datePicker
+                    , filters = emptyFilters
+                    }
                 , datePickerCmd
                 )
 
         ( Loading _, TransactionsFetched (Err error) ) ->
-            ( { model | page = Error (ApiDown error) }, Cmd.none )
+            ( Error (ApiDown error), Cmd.none )
 
         ( BudgetSelector pageData, SelectBudget budget ) ->
-            ( { model | page = Loading "Loading Transactions..." }
+            ( Loading "Loading Transactions..."
             , send (FetchTransactions pageData.token budget.id)
             )
 
@@ -87,9 +82,7 @@ update msg model =
                 newPageData =
                     { pageData | filters = newFilters }
             in
-                ( { model | page = TransactionViewer newPageData }
-                , Cmd.none
-                )
+                ( TransactionViewer newPageData, Cmd.none )
 
         ( TransactionViewer pageData, AdjustmentSelected adjustmentFilter ) ->
             let
@@ -102,9 +95,7 @@ update msg model =
                 newPageData =
                     { pageData | filters = newFilters }
             in
-                ( { model | page = TransactionViewer newPageData }
-                , Cmd.none
-                )
+                ( TransactionViewer newPageData, Cmd.none )
 
         ( TransactionViewer pageData, SetDatePicker msg ) ->
             let
@@ -131,12 +122,12 @@ update msg model =
                 newPageData =
                     { pageData | filters = newFilters, datePicker = newDatePicker }
             in
-                ( { model | page = TransactionViewer newPageData }
+                ( TransactionViewer newPageData
                 , Cmd.map SetDatePicker datePickerCmd
                 )
 
         _ ->
-            ( { model | page = Error ImpossibleState }, Cmd.none )
+            ( Error ImpossibleState, Cmd.none )
 
 
 send : msg -> Cmd msg

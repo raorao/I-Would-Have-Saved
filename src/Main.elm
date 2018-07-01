@@ -10,24 +10,18 @@ import Task
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
 init config location =
-    let
-        ( page, cmd ) =
-            case ( (Router.parseLocation location), (Router.parseAccessToken location) ) of
-                ( Just Router.LoggedOut, _ ) ->
-                    ( Model.LoggedOut config, Cmd.none )
+    case ( (Router.parseLocation location), (Router.parseAccessToken location) ) of
+        ( Just Router.LoggedOut, _ ) ->
+            ( Model.LoggedOut config, Cmd.none )
 
-                ( Just Router.LoggedIn, Just token ) ->
-                    ( Model.Loading "Loading Budgets..."
-                    , (send (FetchBudgets token))
-                    )
+        ( Just Router.LoggedIn, Just token ) ->
+            ( Model.Loading "Loading Budgets...", (Update.send (FetchBudgets token)) )
 
-                ( Just Router.LoggedIn, Nothing ) ->
-                    ( Model.Error Model.NoAccessToken, Cmd.none )
+        ( Just Router.LoggedIn, Nothing ) ->
+            ( Model.Error Model.NoAccessToken, Cmd.none )
 
-                ( Nothing, _ ) ->
-                    ( Model.Error Model.InvalidRoute, Cmd.none )
-    in
-        ( { page = page }, cmd )
+        ( Nothing, _ ) ->
+            ( Model.Error Model.InvalidRoute, Cmd.none )
 
 
 main =
@@ -37,9 +31,3 @@ main =
         , update = Update.update
         , subscriptions = always Sub.none
         }
-
-
-send : msg -> Cmd msg
-send msg =
-    Task.succeed msg
-        |> Task.perform identity

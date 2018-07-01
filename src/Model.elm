@@ -31,7 +31,7 @@ type alias BudgetSelectorData =
     }
 
 
-type Page
+type Model
     = Loading String
     | BudgetSelector BudgetSelectorData
     | TransactionViewer TransactionViewerData
@@ -55,11 +55,6 @@ type alias Filters =
     { category : Maybe CategoryFilter
     , since : Maybe SinceFilter
     , adjustment : Maybe Adjustment
-    }
-
-
-type alias Model =
-    { page : Page
     }
 
 
