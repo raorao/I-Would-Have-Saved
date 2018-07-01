@@ -126,6 +126,9 @@ update msg model =
                 , Cmd.map SetDatePicker datePickerCmd
                 )
 
+        ( _, NoOp ) ->
+            ( model, Cmd.none )
+
         _ ->
             ( Error ImpossibleState, Cmd.none )
 
