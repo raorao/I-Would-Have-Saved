@@ -11,10 +11,10 @@ import Page.ErrorView
 
 
 view : Model -> Html Msg
-view model =
-    case model.page of
-        LoggedOut ->
-            Page.LoggedOut.view model
+view { page } =
+    case page of
+        LoggedOut config ->
+            Page.LoggedOut.view config
 
         Loading message ->
             Page.Loading.view message

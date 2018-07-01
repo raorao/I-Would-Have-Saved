@@ -35,7 +35,7 @@ type Page
     = Loading String
     | BudgetSelector BudgetSelectorData
     | TransactionViewer TransactionViewerData
-    | LoggedOut
+    | LoggedOut Config
     | Error ErrorType
 
 
@@ -59,8 +59,7 @@ type alias Filters =
 
 
 type alias Model =
-    { config : Config
-    , page : Page
+    { page : Page
     }
 
 

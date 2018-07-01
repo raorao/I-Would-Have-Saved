@@ -16,9 +16,9 @@ ynabURL { ynab_client_id, ynab_redirect_uri } =
         ++ "&response_type=token"
 
 
-view : Model.Model -> Html Update.Msg
-view model =
+view : Model.Config -> Html Update.Msg
+view config =
     div []
         [ h2 [] [ text "I Would Have Saved..." ]
-        , a [ href (ynabURL model.config) ] [ text "Login to YNAB" ]
+        , a [ href (ynabURL config) ] [ text "Login to YNAB" ]
         ]

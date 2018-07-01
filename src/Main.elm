@@ -14,7 +14,7 @@ init config location =
         ( page, cmd ) =
             case ( (Router.parseLocation location), (Router.parseAccessToken location) ) of
                 ( Just Router.LoggedOut, _ ) ->
-                    ( Model.LoggedOut, Cmd.none )
+                    ( Model.LoggedOut config, Cmd.none )
 
                 ( Just Router.LoggedIn, Just token ) ->
                     ( Model.Loading "Loading Budgets..."
@@ -27,7 +27,7 @@ init config location =
                 ( Nothing, _ ) ->
                     ( Model.Error Model.InvalidRoute, Cmd.none )
     in
-        ( { config = config, page = page }, cmd )
+        ( { page = page }, cmd )
 
 
 main =
