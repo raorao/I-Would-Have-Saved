@@ -49,6 +49,9 @@ while test $# -gt 0; do
   esac
 done
 
+if [[ `git status --porcelain` ]]; then
+  fatal "there are changes in your working directory. please commit or stash before continuing."
+fi
 
 if [ -z $redirect_uri ]; then
   fatal "please specify a redirect uri."
