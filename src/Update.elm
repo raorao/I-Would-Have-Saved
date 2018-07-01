@@ -26,7 +26,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( model, msg ) of
         ( Loading _, FetchBudgets token ) ->
-            ( Loading "Loading Budgets..."
+            ( Loading LoadingBudgets
             , Http.send (BudgetsFetched token) (Ynab.fetchBudgets token)
             )
 
@@ -34,7 +34,7 @@ update msg model =
             ( Error ImpossibleState, Cmd.none )
 
         ( Loading _, BudgetsFetched token (Ok [ budget ]) ) ->
-            ( Loading "Loading Transactions..."
+            ( Loading LoadingTransactions
             , send (FetchTransactions token budget.id)
             )
 
@@ -45,7 +45,7 @@ update msg model =
             ( Error (ApiDown error), Cmd.none )
 
         ( Loading _, FetchTransactions token budgetId ) ->
-            ( Loading "Loading Transactions..."
+            ( Loading LoadingTransactions
             , Http.send TransactionsFetched (Ynab.fetchTransactions token budgetId)
             )
 
@@ -67,7 +67,7 @@ update msg model =
             ( Error (ApiDown error), Cmd.none )
 
         ( BudgetSelector { token }, SelectBudget budget ) ->
-            ( Loading "Loading Transactions..."
+            ( Loading LoadingTransactions
             , send (FetchTransactions token budget.id)
             )
 

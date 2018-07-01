@@ -15,7 +15,7 @@ init config location =
             ( Model.LoggedOut config, Cmd.none )
 
         ( Just Router.LoggedIn, Just token ) ->
-            ( Model.Loading "Loading Budgets...", (Update.send (FetchBudgets token)) )
+            ( Model.Loading Model.LoadingBudgets, (Update.send (FetchBudgets token)) )
 
         ( Just Router.LoggedIn, Nothing ) ->
             ( Model.Error Model.NoAccessToken, Cmd.none )

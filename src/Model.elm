@@ -31,8 +31,13 @@ type alias BudgetSelectorData =
     }
 
 
+type LoadingType
+    = LoadingBudgets
+    | LoadingTransactions
+
+
 type Model
-    = Loading String
+    = Loading LoadingType
     | BudgetSelector BudgetSelectorData
     | TransactionViewer TransactionViewerData
     | LoggedOut Config

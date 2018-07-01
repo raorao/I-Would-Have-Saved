@@ -16,8 +16,8 @@ view model =
         LoggedOut config ->
             Page.LoggedOut.view config
 
-        Loading message ->
-            Page.Loading.view message
+        Loading pageData ->
+            Page.Loading.view pageData
 
         BudgetSelector pageData ->
             Page.BudgetSelector.view pageData
@@ -25,5 +25,5 @@ view model =
         TransactionViewer pageData ->
             Page.TransactionViewer.view pageData
 
-        Error errorType ->
-            Page.ErrorView.view errorType
+        Error pageData ->
+            Page.ErrorView.view pageData
