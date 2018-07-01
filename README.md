@@ -33,3 +33,8 @@ Your browser should now open to up to a working version of the site. You will be
 5. visit `/home#access_token=<<token>>`
 
 You should now see a working version of the site.
+
+## Deployment
+
+Deployments are handled through GitHub -- currently, netlify will deploy a new
+version of the site whenever the `deploy` branch is updated remotely. see `./deploy.sh --help` for further instructions.
