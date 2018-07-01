@@ -19,9 +19,11 @@ routeTable =
         ]
 
 
-parseLocation : Navigation.Location -> Maybe Route
-parseLocation =
-    parsePath routeTable
+parseLocation : Navigation.Location -> ( Maybe Route, Maybe Model.AccessToken )
+parseLocation location =
+    ( parsePath routeTable location
+    , parseAccessToken location
+    )
 
 
 parseAccessToken : Navigation.Location -> Maybe Model.AccessToken

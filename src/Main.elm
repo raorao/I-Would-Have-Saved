@@ -10,7 +10,7 @@ import Task
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
 init config location =
-    case ( (Router.parseLocation location), (Router.parseAccessToken location) ) of
+    case Router.parseLocation location of
         ( Just Router.LoggedOut, _ ) ->
             ( Model.LoggedOut config, Cmd.none )
 
