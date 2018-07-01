@@ -1,19 +1,20 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 IFS=$'\n\t'
 
 #/ Usage:
 #/
-#/    ./deploy.sh
+#/    ELM_APP_YNAB_CLIENT_ID="client-id ELM_APP_YNAB_REDIRECT_URI=redirect-uri ./deploy.sh
+#/
+#/    ./deploy.sh --env-file .env.production
 #/
 #/ Description:
 #/
-#/    Send a production build of this application to GitHub for deployment.
+#/     Send a production build of this application to GitHub for deployment.
 #/
 #/ Options:
-#/   --redirect-uri: URI to redirect users to after authentication. configured in YNAB.
-#/   --client-id: YNAB API client id. retreived in YNAB.
-#/   --help: Display this help message
+#/     --env-file: Uses .env file to set required environment variables.
+#/     --help: Display this help message
 usage() { grep '^#/' "$0" | cut -c4- ; exit 0 ; }
 
 # logging setup.
@@ -25,6 +26,7 @@ fatal()   { echo "[FATAL]   $@" | tee -a "$LOG_FILE" >&2 ; exit 1 ; }
 
 redirect_uri=""
 client_id=""
+env_file=""
 
 while test $# -gt 0; do
   case "$1" in
@@ -32,14 +34,9 @@ while test $# -gt 0; do
       usage
       shift
       ;;
-    --client-id)
+    --env-file)
       shift
-      client_id=$1
-      shift
-      ;;
-    --redirect-uri)
-      shift
-      redirect_uri=$1
+      env_file=$1
       shift
       ;;
     *)
@@ -49,16 +46,25 @@ while test $# -gt 0; do
   esac
 done
 
+export FOO=1
+
+echo $FOO
+
+if [[ -n $env_file ]]; then
+  info "loading variables from ${env_file} ."
+  source $env_file
+fi
+
+if [ -z $ELM_APP_YNAB_REDIRECT_URI ]; then
+  fatal "please specify a ELM_APP_YNAB_REDIRECT_URI."
+fi
+
+if [ -z $ELM_APP_YNAB_CLIENT_ID ]; then
+  fatal "please specify a ELM_APP_YNAB_CLIENT_ID."
+fi
+
 if [[ `git status --porcelain` ]]; then
   fatal "there are changes in your working directory. please commit or stash before continuing."
-fi
-
-if [ -z $redirect_uri ]; then
-  fatal "please specify a redirect uri."
-fi
-
-if [ -z $client_id ]; then
-  fatal "please specify a client_id."
 fi
 
 # cleanup regardless of error.
@@ -76,7 +82,7 @@ git checkout -b $branch_name
 
 info "Building Elm App"
 
-ELM_APP_YNAB_CLIENT_ID=$client_id ELM_APP_YNAB_REDIRECT_URI=$redirect_uri elm-app build
+ELM_APP_YNAB_REDIRECT_URI=$ELM_APP_YNAB_REDIRECT_URI ELM_APP_YNAB_CLIENT_ID=$ELM_APP_YNAB_CLIENT_ID elm-app build
 
 info "Committing Build Artifacts"
 
