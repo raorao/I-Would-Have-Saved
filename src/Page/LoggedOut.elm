@@ -1,7 +1,7 @@
 module Page.LoggedOut exposing (..)
 
 import Model
-import Html exposing (Html, text, a)
+import Html exposing (..)
 import Html.Attributes exposing (href)
 import Update
 import Model
@@ -18,4 +18,7 @@ ynabURL { ynab_client_id, ynab_redirect_uri } =
 
 view : Model.Model -> Html Update.Msg
 view model =
-    a [ href (ynabURL model.config) ] [ text "Login to YNAB" ]
+    div []
+        [ h2 [] [ text "I Would Have Saved..." ]
+        , a [ href (ynabURL model.config) ] [ text "Login to YNAB" ]
+        ]
