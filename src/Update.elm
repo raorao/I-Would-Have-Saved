@@ -66,9 +66,9 @@ update msg model =
         ( Loading _, TransactionsFetched (Err error) ) ->
             ( Error (ApiDown error), Cmd.none )
 
-        ( BudgetSelector pageData, SelectBudget budget ) ->
+        ( BudgetSelector { token }, SelectBudget budget ) ->
             ( Loading "Loading Transactions..."
-            , send (FetchTransactions pageData.token budget.id)
+            , send (FetchTransactions token budget.id)
             )
 
         ( TransactionViewer pageData, CategorySelected categoryFilter ) ->
