@@ -3,7 +3,7 @@ module Router exposing (..)
 import UrlParser exposing (..)
 import Navigation
 import Regex
-import Model
+import Model exposing (AccessToken(..))
 
 
 type Route
@@ -11,7 +11,7 @@ type Route
     | LoggedIn
 
 
-routeTable : Parser (Route -> a) a
+routeTable : Parser (Route -> Route) Route
 routeTable =
     oneOf
         [ map LoggedIn (s "home")
@@ -19,23 +19,19 @@ routeTable =
         ]
 
 
-parseLocation : Navigation.Location -> ( Maybe Route, Maybe Model.AccessToken )
+parseLocation : Navigation.Location -> ( Maybe Route, Maybe AccessToken )
 parseLocation location =
     ( parsePath routeTable location
     , parseAccessToken location
     )
 
 
-parseAccessToken : Navigation.Location -> Maybe Model.AccessToken
+parseAccessToken : Navigation.Location -> Maybe AccessToken
 parseAccessToken location =
-    let
-        matcher =
-            Regex.regex "#access_token=(.*)"
-    in
-        location.hash
-            |> Regex.find (Regex.AtMost 1) matcher
-            |> List.head
-            |> Maybe.map .submatches
-            |> Maybe.andThen List.head
-            |> Maybe.andThen identity
-            |> Maybe.map (Model.AccessToken)
+    location.hash
+        |> Regex.find (Regex.AtMost 1) (Regex.regex "#access_token=(.*)")
+        |> List.head
+        |> Maybe.map .submatches
+        |> Maybe.andThen List.head
+        |> Maybe.andThen identity
+        |> Maybe.map AccessToken
