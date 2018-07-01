@@ -13,9 +13,9 @@ import DatePicker
 
 type Msg
     = NoOp
-    | FetchBudgets
-    | BudgetsFetched (Result Http.Error (Zipper Model.Budget))
-    | FetchTransactions Model.BudgetId
+    | FetchBudgets Model.AccessToken
+    | BudgetsFetched Model.AccessToken (Result Http.Error (Zipper Model.Budget))
+    | FetchTransactions Model.AccessToken Model.BudgetId
     | TransactionsFetched (Result Http.Error (List Model.Transaction))
     | SelectBudget Model.Budget
     | CategorySelected Model.CategoryFilter
@@ -29,25 +29,20 @@ update msg model =
         NoOp ->
             ( model, Cmd.none )
 
-        FetchBudgets ->
-            case model.token of
-                Nothing ->
-                    ( { model | page = Model.Error Model.NoAccessToken }, Cmd.none )
+        FetchBudgets token ->
+            let
+                requestCmd =
+                    token
+                        |> Ynab.fetchBudgets
+                        |> Http.send (BudgetsFetched token)
+            in
+                ( { model
+                    | page = Model.Loading "Loading Budgets..."
+                  }
+                , requestCmd
+                )
 
-                Just token ->
-                    let
-                        requestCmd =
-                            token
-                                |> Ynab.fetchBudgets
-                                |> Http.send BudgetsFetched
-                    in
-                        ( { model
-                            | page = Model.Loading "Loading Budgets..."
-                          }
-                        , requestCmd
-                        )
-
-        BudgetsFetched (Ok budgets) ->
+        BudgetsFetched token (Ok budgets) ->
             let
                 ( page, cmd ) =
                     case Zipper.toList budgets of
@@ -56,26 +51,30 @@ update msg model =
 
                         [ budget ] ->
                             ( Model.Loading "Loading Transactions..."
-                            , send (FetchTransactions budget.id)
+                            , send (FetchTransactions token budget.id)
                             )
 
                         _ ->
-                            ( Model.BudgetSelector { budgets = budgets }, Cmd.none )
+                            ( Model.BudgetSelector
+                                { budgets = budgets
+                                , token = token
+                                }
+                            , Cmd.none
+                            )
             in
                 ( { model | page = page }, cmd )
 
-        BudgetsFetched (Err error) ->
+        BudgetsFetched token (Err error) ->
             ( { model | page = Model.Error (Model.ApiDown error) }
             , Cmd.none
             )
 
         SelectBudget budget ->
             case model.page of
-                Model.BudgetSelector pageData ->
+                Model.BudgetSelector { token, budgets } ->
                     let
                         maybeBudgetId =
-                            pageData
-                                |> .budgets
+                            budgets
                                 |> Zipper.first
                                 |> Zipper.find (\b -> b.name == budget.name)
                                 |> Maybe.map Zipper.current
@@ -85,7 +84,7 @@ update msg model =
                             case maybeBudgetId of
                                 Just budgetId ->
                                     ( Model.Loading "Loading Transactions..."
-                                    , send (FetchTransactions budgetId)
+                                    , send (FetchTransactions token budgetId)
                                     )
 
                                 Nothing ->
@@ -96,24 +95,17 @@ update msg model =
                 _ ->
                     ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
 
-        FetchTransactions budgetId ->
-            case model.token of
-                Nothing ->
-                    ( { model | page = Model.Error Model.NoAccessToken }
-                    , Cmd.none
-                    )
-
-                Just token ->
-                    let
-                        requestCmd =
-                            Ynab.fetchTransactions token budgetId
-                                |> Http.send TransactionsFetched
-                    in
-                        ( { model
-                            | page = Model.Loading "Loading Transactions..."
-                          }
-                        , requestCmd
-                        )
+        FetchTransactions token budgetId ->
+            let
+                requestCmd =
+                    Ynab.fetchTransactions token budgetId
+                        |> Http.send TransactionsFetched
+            in
+                ( { model
+                    | page = Model.Loading "Loading Transactions..."
+                  }
+                , requestCmd
+                )
 
         TransactionsFetched (Ok transactions) ->
             let
@@ -212,28 +204,6 @@ update msg model =
 
                 _ ->
                     ( { model | page = Model.Error Model.ImpossibleState }, Cmd.none )
-
-
-
---let
---    ( newDatePicker, datePickerCmd, dateEvent ) =
---        DatePicker.update DatePicker.defaultSettings msg model.datePicker
---    date =
---        case dateEvent of
---            DatePicker.Changed (Just newDate) ->
---                Just (Model.SinceFilter newDate)
---            _ ->
---                Nothing
---    filters =
---        model.filters
---    newFilters =
---        { filters | since = date }
---in
---    { model
---        | datePicker = newDatePicker
---        , filters = newFilters
---    }
---        ! [ Cmd.map SetDatePicker datePickerCmd ]
 
 
 send : msg -> Cmd msg

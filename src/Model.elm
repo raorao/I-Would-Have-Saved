@@ -28,6 +28,7 @@ type alias TransactionViewerData =
 
 type alias BudgetSelectorData =
     { budgets : Zipper Budget
+    , token : AccessToken
     }
 
 
@@ -61,7 +62,6 @@ type alias Filters =
 type alias Model =
     { config : Config
     , page : Page
-    , token : Maybe AccessToken
     }
 
 

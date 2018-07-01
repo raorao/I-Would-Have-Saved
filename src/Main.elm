@@ -6,31 +6,28 @@ import Model
 import Update exposing (Msg(..))
 import View
 import Task
-import RemoteData
 
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
 init config location =
     let
         ( page, cmd ) =
-            case Router.parseLocation location of
-                Just Router.LoggedOut ->
+            case ( (Router.parseLocation location), (Router.parseAccessToken location) ) of
+                ( Just Router.LoggedOut, _ ) ->
                     ( Model.LoggedOut, Cmd.none )
 
-                Just Router.LoggedIn ->
+                ( Just Router.LoggedIn, Just token ) ->
                     ( Model.Loading "Loading Budgets..."
-                    , (send FetchBudgets)
+                    , (send (FetchBudgets token))
                     )
 
-                Nothing ->
+                ( Just Router.LoggedIn, Nothing ) ->
+                    ( Model.Error Model.NoAccessToken, Cmd.none )
+
+                ( Nothing, _ ) ->
                     ( Model.Error Model.InvalidRoute, Cmd.none )
     in
-        ( { config = config
-          , page = page
-          , token = Router.parseAccessToken location
-          }
-        , cmd
-        )
+        ( { config = config, page = page }, cmd )
 
 
 main =
