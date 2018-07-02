@@ -4,13 +4,15 @@ Application for learning from your YNAB transaction history.
 
 ## Local Development
 
-require elm 0.18 and npm to run. To run:
+Requires [npm](https://www.npmjs.com/) to run. To get a server running locally:
 
-1. install a `create-elm-app` for development environment management.
+1. install `create-elm-app` for development environment management.
 
 ```
 npm install create-elm-app -g
 ```
+
+Note: this will install elm if you have yet do to so.
 
 2. create a `.env` file
 
