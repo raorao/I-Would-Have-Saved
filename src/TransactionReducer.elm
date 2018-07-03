@@ -1,4 +1,4 @@
-module TransactionReducer exposing (savings, categories)
+module TransactionReducer exposing (savings, categories, payees)
 
 import Model exposing (..)
 import List.Extra
@@ -10,6 +10,7 @@ savings filters transactions =
     transactions
         |> List.filter (applySince filters.since)
         |> List.filter (applyCategory filters.category)
+        |> List.filter (applyPayee filters.payee)
         |> List.map .amount
         |> List.sum
         |> toFloat
@@ -25,6 +26,15 @@ categories transactions =
         |> List.Extra.unique
         |> List.filter ((/=) "Immediate Income SubCategory")
         |> List.filter ((/=) "Split (Multiple Categories)...")
+        |> List.sort
+
+
+payees : List Transaction -> List String
+payees transactions =
+    transactions
+        |> List.map .payee
+        |> List.filterMap identity
+        |> List.Extra.unique
         |> List.sort
 
 
@@ -61,6 +71,18 @@ applyCategory categoryFilter transaction =
         Active (CategoryFilter category) ->
             transaction.category
                 |> Maybe.map ((==) category)
+                |> Maybe.withDefault False
+
+
+applyPayee : Filter PayeeFilter -> Transaction -> Bool
+applyPayee payeeFilter transaction =
+    case payeeFilter of
+        Inactive ->
+            True
+
+        Active (PayeeFilter payee) ->
+            transaction.payee
+                |> Maybe.map ((==) payee)
                 |> Maybe.withDefault False
 
 

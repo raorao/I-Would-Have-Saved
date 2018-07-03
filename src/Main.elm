@@ -44,6 +44,9 @@ subscriptions model =
                 , Dropdown.subscriptions
                     viewState.categoryDropdown
                     (Update.DropdownMsg Model.CategoryDropdown)
+                , Dropdown.subscriptions
+                    viewState.payeeDropdown
+                    (Update.DropdownMsg Model.PayeeDropdown)
                 ]
 
         _ ->

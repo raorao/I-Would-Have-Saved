@@ -1,7 +1,6 @@
 module Styling exposing (..)
 
 import Html exposing (..)
-import Html.Attributes exposing (..)
 import Update exposing (Msg)
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col

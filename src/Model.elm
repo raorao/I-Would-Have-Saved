@@ -31,11 +31,13 @@ type alias TransactionViewerData =
 type TransactionViewerDropdown
     = CategoryDropdown
     | AdjustmentDropdown
+    | PayeeDropdown
 
 
 type alias TransactionViewerViewState =
     { adjustmentDropdown : Dropdown.State
     , categoryDropdown : Dropdown.State
+    , payeeDropdown : Dropdown.State
     }
 
 
@@ -62,6 +64,10 @@ type CategoryFilter
     = CategoryFilter String
 
 
+type PayeeFilter
+    = PayeeFilter String
+
+
 type SinceFilter
     = SinceFilter Date
 
@@ -82,6 +88,7 @@ type alias Filters =
     { category : Filter CategoryFilter
     , since : Filter SinceFilter
     , adjustment : Filter AdjustmentFilter
+    , payee : Filter PayeeFilter
     }
 
 
@@ -110,13 +117,18 @@ type alias Transaction =
 
 emptyFilters : Filters
 emptyFilters =
-    Filters Inactive Inactive Inactive
+    { category = Inactive
+    , since = Inactive
+    , adjustment = Inactive
+    , payee = Inactive
+    }
 
 
 initialViewState : TransactionViewerViewState
 initialViewState =
     { adjustmentDropdown = Dropdown.initialState
     , categoryDropdown = Dropdown.initialState
+    , payeeDropdown = Dropdown.initialState
     }
 
 

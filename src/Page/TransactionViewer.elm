@@ -24,6 +24,8 @@ view { filters, datePicker, transactions, viewState } =
             [ viewAdjustmentDropdown filters viewState.adjustmentDropdown ]
         , selectorRow "On"
             [ viewCategoryDropdown transactions filters viewState.categoryDropdown ]
+        , selectorRow "At"
+            [ viewPayeeDropdown transactions filters viewState.payeeDropdown ]
         , selectorRow "Since" [ viewSinceDatePicker datePicker filters.since ]
         ]
 
@@ -153,6 +155,41 @@ categoryDropdownItem category =
     Dropdown.buttonItem
         [ onClick (Update.CategorySelected (Model.CategoryFilter category)) ]
         [ text category ]
+
+
+viewPayeeDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
+viewPayeeDropdown transactions { payee } dropdown =
+    let
+        payeeName =
+            case payee of
+                Model.Active (Model.PayeeFilter payee) ->
+                    payee
+
+                Model.Inactive ->
+                    "..."
+    in
+        Dropdown.dropdown
+            dropdown
+            { options = []
+            , toggleMsg = (Update.DropdownMsg Model.PayeeDropdown)
+            , toggleButton =
+                Dropdown.toggle [ Button.primary, Button.large ] [ text payeeName ]
+            , items = payeeDropdownItems transactions
+            }
+
+
+payeeDropdownItems : List Model.Transaction -> List (Dropdown.DropdownItem Msg)
+payeeDropdownItems transactions =
+    transactions
+        |> TransactionReducer.payees
+        |> List.map payeeDropdownItem
+
+
+payeeDropdownItem : String -> Dropdown.DropdownItem Msg
+payeeDropdownItem payee =
+    Dropdown.buttonItem
+        [ onClick (Update.PayeeSelected (Model.PayeeFilter payee)) ]
+        [ text payee ]
 
 
 viewSinceDatePicker : DatePicker.DatePicker -> Model.Filter Model.SinceFilter -> Html Update.Msg

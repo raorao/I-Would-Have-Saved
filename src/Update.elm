@@ -19,6 +19,7 @@ type Msg
     | TransactionsFetched (Result Http.Error (List Transaction))
     | SelectBudget Budget
     | CategorySelected CategoryFilter
+    | PayeeSelected PayeeFilter
     | AdjustmentSelected AdjustmentFilter
     | SetDatePicker DatePicker.Msg
     | DropdownMsg Model.TransactionViewerDropdown Dropdown.State
@@ -87,6 +88,19 @@ update msg model =
             in
                 ( TransactionViewer newPageData, Cmd.none )
 
+        ( TransactionViewer pageData, PayeeSelected payeeFilter ) ->
+            let
+                filters =
+                    pageData.filters
+
+                newFilters =
+                    { filters | payee = Active payeeFilter }
+
+                newPageData =
+                    { pageData | filters = newFilters }
+            in
+                ( TransactionViewer newPageData, Cmd.none )
+
         ( TransactionViewer pageData, AdjustmentSelected adjustmentFilter ) ->
             let
                 filters =
@@ -141,6 +155,9 @@ update msg model =
 
                         AdjustmentDropdown ->
                             { viewState | adjustmentDropdown = dropdown }
+
+                        PayeeDropdown ->
+                            { viewState | payeeDropdown = dropdown }
 
                 newPageData =
                     { pageData | viewState = newViewState }
