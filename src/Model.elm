@@ -34,6 +34,7 @@ type TransactionViewerDropdown
 
 type alias TransactionViewerViewState =
     { adjustmentDropdown : Dropdown.State
+    , categoryDropdown : Dropdown.State
     }
 
 
@@ -109,3 +110,10 @@ type alias Transaction =
 emptyFilters : Filters
 emptyFilters =
     Filters Inactive Inactive Inactive
+
+
+initialViewState : TransactionViewerViewState
+initialViewState =
+    { adjustmentDropdown = Dropdown.initialState
+    , categoryDropdown = Dropdown.initialState
+    }

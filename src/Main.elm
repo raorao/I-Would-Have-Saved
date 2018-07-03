@@ -41,6 +41,9 @@ subscriptions model =
                 [ Dropdown.subscriptions
                     viewState.adjustmentDropdown
                     (Update.DropdownMsg Model.AdjustmentDropdown)
+                , Dropdown.subscriptions
+                    viewState.categoryDropdown
+                    (Update.DropdownMsg Model.CategoryDropdown)
                 ]
 
         _ ->

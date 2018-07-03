@@ -5,11 +5,10 @@ import Html exposing (..)
 import Html.Events exposing (onClick)
 import Update exposing (Msg)
 import TransactionReducer
-import Dropdown
 import DatePicker
 import Round
 import Styling
-import Bootstrap.Dropdown as BDropdown
+import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Button as Button
 import Bootstrap.Utilities.Flex as Flex
 
@@ -20,7 +19,7 @@ view { filters, datePicker, transactions, viewState } =
         [ Styling.title
         , Styling.titleWithText (viewSavings filters transactions)
         , Styling.row [ viewAdjustmentSelector filters viewState.adjustmentDropdown ]
-        , Styling.row [ viewCategorySelector transactions ]
+        , Styling.row [ viewCategorySelector transactions filters viewState.categoryDropdown ]
         , Styling.row [ viewSinceSelector datePicker filters ]
         ]
 
@@ -33,7 +32,7 @@ viewSavings filters transactions =
         |> (++) "$"
 
 
-viewAdjustmentSelector : Model.Filters -> BDropdown.State -> Html Msg
+viewAdjustmentSelector : Model.Filters -> Dropdown.State -> Html Msg
 viewAdjustmentSelector filters dropdown =
     div
         [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter ]
@@ -58,7 +57,7 @@ adjustmentFilterString adjustmentFilter =
             "nothing"
 
 
-viewAdjustmentDropdown : Model.Filters -> BDropdown.State -> Html Msg
+viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
 viewAdjustmentDropdown { adjustment } dropdown =
     let
         adjustmentName =
@@ -69,17 +68,17 @@ viewAdjustmentDropdown { adjustment } dropdown =
                 Model.Inactive ->
                     "..."
     in
-        BDropdown.dropdown
+        Dropdown.dropdown
             dropdown
             { options = []
             , toggleMsg = (Update.DropdownMsg Model.AdjustmentDropdown)
             , toggleButton =
-                BDropdown.toggle [ Button.primary ] [ text adjustmentName ]
+                Dropdown.toggle [ Button.primary ] [ text adjustmentName ]
             , items = adjustmentDropdownItems
             }
 
 
-adjustmentDropdownItems : List (BDropdown.DropdownItem Msg)
+adjustmentDropdownItems : List (Dropdown.DropdownItem Msg)
 adjustmentDropdownItems =
     let
         options =
@@ -92,52 +91,53 @@ adjustmentDropdownItems =
         List.map adjustmentDropdownItem options
 
 
-adjustmentDropdownItem : Model.AdjustmentFilter -> BDropdown.DropdownItem Msg
+adjustmentDropdownItem : Model.AdjustmentFilter -> Dropdown.DropdownItem Msg
 adjustmentDropdownItem adjustmentFilter =
-    BDropdown.buttonItem
+    Dropdown.buttonItem
         [ onClick (Update.AdjustmentSelected adjustmentFilter) ]
         [ text (adjustmentFilterString adjustmentFilter) ]
 
 
-viewCategorySelector : List Model.Transaction -> Html Msg
-viewCategorySelector transactions =
+viewCategorySelector : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
+viewCategorySelector transactions filters dropdown =
     div
-        []
-        [ Styling.selectorLabel "On", viewCategoryDropdown transactions ]
+        [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter ]
+        [ Styling.selectorLabel "On", viewCategoryDropdown transactions filters dropdown ]
 
 
-viewCategoryDropdown : List Model.Transaction -> Html Msg
-viewCategoryDropdown transactions =
-    Dropdown.dropdown
-        (Dropdown.Options
-            (categoryDropdownItems transactions)
-            (Just (Dropdown.Item "Category" "Category" False))
-            selectCategory
-        )
-        []
-        (Just "Category")
+viewCategoryDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
+viewCategoryDropdown transactions { category } dropdown =
+    let
+        categoryName =
+            case category of
+                Model.Active (Model.CategoryFilter category) ->
+                    category
+
+                Model.Inactive ->
+                    "..."
+    in
+        Dropdown.dropdown
+            dropdown
+            { options = []
+            , toggleMsg = (Update.DropdownMsg Model.CategoryDropdown)
+            , toggleButton =
+                Dropdown.toggle [ Button.primary ] [ text categoryName ]
+            , items = categoryDropdownItems transactions
+            }
 
 
-categoryDropdownItems : List Model.Transaction -> List Dropdown.Item
+categoryDropdownItems : List Model.Transaction -> List (Dropdown.DropdownItem Msg)
 categoryDropdownItems transactions =
     transactions
         |> TransactionReducer.categories
-        |> List.map enabledDropdownItem
+        |> List.map categoryDropdownItem
 
 
-enabledDropdownItem : String -> Dropdown.Item
-enabledDropdownItem str =
-    Dropdown.Item str str True
-
-
-selectCategory : Maybe String -> Update.Msg
-selectCategory selection =
-    case selection of
-        Just category ->
-            Update.CategorySelected (Model.CategoryFilter category)
-
-        Nothing ->
-            Update.NoOp
+categoryDropdownItem : String -> Dropdown.DropdownItem Msg
+categoryDropdownItem category =
+    Dropdown.buttonItem
+        [ onClick (Update.CategorySelected (Model.CategoryFilter category)) ]
+        [ text category ]
 
 
 viewSinceSelector : DatePicker.DatePicker -> Model.Filters -> Html Update.Msg
