@@ -11,6 +11,7 @@ savings filters transactions =
         |> List.filter (applySince filters.since)
         |> List.filter (applyCategory filters.category)
         |> List.filter (applyPayee filters.payee)
+        |> List.filter (.category >> isVisibleCategory)
         |> List.map .amount
         |> List.sum
         |> toFloat
@@ -22,10 +23,9 @@ categories : List Transaction -> List String
 categories transactions =
     transactions
         |> List.map .category
+        |> List.filter isVisibleCategory
         |> List.filterMap identity
         |> List.Extra.unique
-        |> List.filter ((/=) "Immediate Income SubCategory")
-        |> List.filter ((/=) "Split (Multiple Categories)...")
         |> List.sort
 
 
@@ -36,6 +36,22 @@ payees transactions =
         |> List.filterMap identity
         |> List.Extra.unique
         |> List.sort
+
+
+isVisibleCategory : Maybe String -> Bool
+isVisibleCategory category =
+    case category of
+        Just "Immediate Income SubCategory" ->
+            False
+
+        Just "Split (Multiple Categories)..." ->
+            False
+
+        Just _ ->
+            True
+
+        Nothing ->
+            True
 
 
 applyAdjustment : Filter AdjustmentFilter -> Float -> Float
