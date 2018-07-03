@@ -3,13 +3,22 @@ module Page.Loading exposing (..)
 import Html exposing (..)
 import Update
 import Model exposing (LoadingType(..))
+import Styling
+import Bootstrap.Progress as Progress
+import Bootstrap.Utilities.Spacing as Spacing
 
 
 view : LoadingType -> Html Update.Msg
 view loadingType =
     div []
-        [ h2 [] [ text "I Would Have Saved..." ]
-        , text (message loadingType)
+        [ Styling.title
+        , Styling.row [ h5 [ Spacing.mt2 ] [ text (message loadingType) ] ]
+        , Styling.row
+            [ Progress.progress
+                [ Progress.animated
+                , Progress.value 100
+                ]
+            ]
         ]
 
 
