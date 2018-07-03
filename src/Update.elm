@@ -18,9 +18,9 @@ type Msg
     | FetchTransactions AccessToken BudgetId
     | TransactionsFetched (Result Http.Error (List Transaction))
     | SelectBudget Budget
-    | CategorySelected CategoryFilter
-    | PayeeSelected PayeeFilter
-    | AdjustmentSelected AdjustmentFilter
+    | CategorySelected (Filter CategoryFilter)
+    | PayeeSelected (Filter PayeeFilter)
+    | AdjustmentSelected (Filter AdjustmentFilter)
     | SetDatePicker DatePicker.Msg
     | DropdownMsg Model.TransactionViewerDropdown Dropdown.State
 
@@ -81,7 +81,7 @@ update msg model =
                     pageData.filters
 
                 newFilters =
-                    { filters | category = Active categoryFilter }
+                    { filters | category = categoryFilter }
 
                 newPageData =
                     { pageData | filters = newFilters }
@@ -94,7 +94,7 @@ update msg model =
                     pageData.filters
 
                 newFilters =
-                    { filters | payee = Active payeeFilter }
+                    { filters | payee = payeeFilter }
 
                 newPageData =
                     { pageData | filters = newFilters }
@@ -107,7 +107,7 @@ update msg model =
                     pageData.filters
 
                 newFilters =
-                    { filters | adjustment = Active adjustmentFilter }
+                    { filters | adjustment = adjustmentFilter }
 
                 newPageData =
                     { pageData | filters = newFilters }

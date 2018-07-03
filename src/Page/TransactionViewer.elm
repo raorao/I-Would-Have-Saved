@@ -100,7 +100,7 @@ adjustmentDropdownItems =
 adjustmentDropdownItem : Model.AdjustmentFilter -> Dropdown.DropdownItem Msg
 adjustmentDropdownItem adjustmentFilter =
     Dropdown.buttonItem
-        [ onClick (Update.AdjustmentSelected adjustmentFilter) ]
+        [ onClick (Update.AdjustmentSelected (Model.Active adjustmentFilter)) ]
         [ text (adjustmentFilterString adjustmentFilter) ]
 
 
@@ -151,7 +151,7 @@ categoryDropdownItems filters transactions =
 categoryDropdownItem : String -> Dropdown.DropdownItem Msg
 categoryDropdownItem category =
     Dropdown.buttonItem
-        [ onClick (Update.CategorySelected (Model.CategoryFilter category)) ]
+        [ onClick (Update.CategorySelected (Model.Active (Model.CategoryFilter category))) ]
         [ text category ]
 
 
@@ -186,7 +186,7 @@ payeeDropdownItems filters transactions =
 payeeDropdownItem : String -> Dropdown.DropdownItem Msg
 payeeDropdownItem payee =
     Dropdown.buttonItem
-        [ onClick (Update.PayeeSelected (Model.PayeeFilter payee)) ]
+        [ onClick (Update.PayeeSelected (Model.Active (Model.PayeeFilter payee))) ]
         [ text payee ]
 
 
