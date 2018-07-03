@@ -5,31 +5,40 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Update
+import Styling
+import Bootstrap.Button as Button
+import Bootstrap.Utilities.Spacing as Spacing
+import Bootstrap.Utilities.Size as Size
 
 
 view : Model.BudgetSelectorData -> Html Update.Msg
 view { budgets } =
     div []
-        [ h2 [] [ text "Select Your Budget" ]
-        , fieldset [] (viewRadioButtons budgets)
+        [ Styling.titleWithText "Select Your Budget"
+        , viewBudgets budgets
         ]
 
 
-viewRadioButtons : List Model.Budget -> List (Html Update.Msg)
-viewRadioButtons budgets =
+viewBudgets : List Model.Budget -> Html Update.Msg
+viewBudgets budgets =
     budgets
         |> List.sortBy .name
-        |> List.map viewBudgetOption
+        |> List.indexedMap viewBudget
+        |> List.map List.singleton
+        |> List.map Styling.row
+        |> div []
 
 
-viewBudgetOption : Model.Budget -> Html Update.Msg
-viewBudgetOption budget =
-    label []
-        [ input
-            [ type_ "radio"
-            , name "radio-button"
-            , onClick (Update.SelectBudget budget)
+viewBudget : Int -> Model.Budget -> Html Update.Msg
+viewBudget index budget =
+    Button.linkButton
+        [ Button.info
+        , Button.large
+        , Button.attrs
+            [ onClick (Update.SelectBudget budget)
+            , tabindex index
+            , Spacing.mt4
+            , Size.w50
             ]
-            []
-        , text budget.name
         ]
+        [ text budget.name ]

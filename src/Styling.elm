@@ -24,7 +24,12 @@ row =
     rowWithColOptions []
 
 
+titleWithText : String -> Html Msg
+titleWithText str =
+    row
+        [ h1 [ Spacing.mb4 ] [ text str ] ]
+
+
 title : Html Msg
 title =
-    row
-        [ h1 [ Spacing.mb4 ] [ text "I Would Have Saved..." ] ]
+    titleWithText "I Would Have Saved..."
