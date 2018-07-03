@@ -8,10 +8,21 @@ import Page.LoggedOut
 import Page.BudgetSelector
 import Page.TransactionViewer
 import Page.ErrorView
+import Bootstrap.CDN as CDN
+import Bootstrap.Grid as Grid
+import Bootstrap.Utilities.Spacing as Spacing
 
 
 view : Model -> Html Msg
 view model =
+    Grid.containerFluid [ Spacing.mt4 ]
+        [ CDN.stylesheet
+        , (pageView model)
+        ]
+
+
+pageView : Model -> Html Msg
+pageView model =
     case model of
         LoggedOut config ->
             Page.LoggedOut.view config
