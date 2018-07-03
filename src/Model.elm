@@ -4,6 +4,7 @@ import Date exposing (Date)
 import DatePicker
 import Http
 import Bootstrap.Dropdown as Dropdown
+import Html.Attributes
 
 
 type alias Config =
@@ -117,3 +118,18 @@ initialViewState =
     { adjustmentDropdown = Dropdown.initialState
     , categoryDropdown = Dropdown.initialState
     }
+
+
+datePickerSettings : DatePicker.Settings
+datePickerSettings =
+    let
+        defaultSettings =
+            DatePicker.defaultSettings
+    in
+        { defaultSettings
+            | placeholder = "..."
+            , inputAttributes =
+                [ Html.Attributes.class "form-control form-control-lg"
+                , Html.Attributes.style [ ( "text-align", "center" ) ]
+                ]
+        }

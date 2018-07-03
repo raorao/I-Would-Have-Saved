@@ -104,7 +104,7 @@ update msg model =
             let
                 ( newDatePicker, datePickerCmd, dateEvent ) =
                     DatePicker.update
-                        DatePicker.defaultSettings
+                        Model.datePickerSettings
                         msg
                         pageData.datePicker
 

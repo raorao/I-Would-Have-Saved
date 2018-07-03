@@ -2,6 +2,7 @@ module Page.TransactionViewer exposing (..)
 
 import Model
 import Html exposing (..)
+import Html.Attributes exposing (class)
 import Html.Events exposing (onClick)
 import Update exposing (Msg)
 import TransactionReducer
@@ -40,8 +41,26 @@ selectorRow title children =
     Styling.row
         [ div
             [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter, Spacing.my1 ]
-            ([ Styling.selectorLabel title ] ++ children)
+            ([ label
+                [ class "lead"
+                , Spacing.mr2
+                , Spacing.mb0
+                ]
+                [ text title ]
+             ]
+                ++ children
+            )
         ]
+
+
+selectorLabel : String -> Html Msg
+selectorLabel str =
+    label
+        [ class "lead"
+        , Spacing.mr2
+        , Spacing.mb0
+        ]
+        [ text str ]
 
 
 viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
@@ -60,7 +79,7 @@ viewAdjustmentDropdown { adjustment } dropdown =
             { options = []
             , toggleMsg = (Update.DropdownMsg Model.AdjustmentDropdown)
             , toggleButton =
-                Dropdown.toggle [ Button.primary ] [ text adjustmentName ]
+                Dropdown.toggle [ Button.primary, Button.large ] [ text adjustmentName ]
             , items = adjustmentDropdownItems
             }
 
@@ -117,7 +136,7 @@ viewCategoryDropdown transactions { category } dropdown =
             { options = []
             , toggleMsg = (Update.DropdownMsg Model.CategoryDropdown)
             , toggleButton =
-                Dropdown.toggle [ Button.primary ] [ text categoryName ]
+                Dropdown.toggle [ Button.primary, Button.large ] [ text categoryName ]
             , items = categoryDropdownItems transactions
             }
 
@@ -149,6 +168,6 @@ viewSinceDatePicker datePicker currentSince =
     in
         DatePicker.view
             selected
-            DatePicker.defaultSettings
+            Model.datePickerSettings
             datePicker
             |> Html.map Update.SetDatePicker

@@ -34,13 +34,3 @@ titleWithText str =
 title : Html Msg
 title =
     titleWithText "I Would Have Saved..."
-
-
-selectorLabel : String -> Html Msg
-selectorLabel str =
-    label
-        [ class "lead"
-        , Spacing.mr2
-        , Spacing.mb0
-        ]
-        [ text str ]
