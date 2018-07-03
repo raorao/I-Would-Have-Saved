@@ -12,15 +12,6 @@ import Bootstrap.Grid.Col as Col
 import Bootstrap.Text as Text
 
 
-ynabURL : Model.Config -> String
-ynabURL { ynab_client_id, ynab_redirect_uri } =
-    "https://app.youneedabudget.com/oauth/authorize?client_id="
-        ++ ynab_client_id
-        ++ "&redirect_uri="
-        ++ ynab_redirect_uri
-        ++ "&response_type=token"
-
-
 view : Model.Config -> Html Update.Msg
 view config =
     div []
@@ -36,3 +27,12 @@ view config =
             , p [] [ text "Tincidunt arcu non sodales neque. Libero justo laoreet sit amet." ]
             ]
         ]
+
+
+ynabURL : Model.Config -> String
+ynabURL { ynab_client_id, ynab_redirect_uri } =
+    "https://app.youneedabudget.com/oauth/authorize?client_id="
+        ++ ynab_client_id
+        ++ "&redirect_uri="
+        ++ ynab_redirect_uri
+        ++ "&response_type=token"
