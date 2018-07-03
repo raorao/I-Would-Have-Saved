@@ -12,7 +12,7 @@ view : LoadingType -> Html Update.Msg
 view loadingType =
     div []
         [ Styling.title
-        , Styling.row [ h5 [ Spacing.mt2 ] [ text (message loadingType) ] ]
+        , Styling.row [ h5 [ Spacing.mb2 ] [ text (message loadingType) ] ]
         , Styling.row
             [ Progress.progress
                 [ Progress.animated

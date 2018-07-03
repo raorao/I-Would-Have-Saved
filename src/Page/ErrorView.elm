@@ -1,33 +1,44 @@
 module Page.ErrorView exposing (view)
 
 import Html exposing (..)
+import Html.Attributes exposing (href)
 import Model exposing (ErrorType(..))
 import Update
+import Styling
+import Bootstrap.Alert as Alert
 
 
 view : ErrorType -> Html Update.Msg
 view error =
     div []
-        [ h2 [] [ text "I Would Have Saved..." ]
-        , parseError error
+        [ Styling.title
+        , Styling.row [ alert (parseError error) ]
         ]
 
 
-parseError : ErrorType -> Html Update.Msg
+parseError : ErrorType -> String
 parseError errorType =
     case errorType of
         NoAccessToken ->
-            text "Could not find access token. Try connecting to YNAB again."
+            "Could not find access token."
 
         ApiDown error ->
             let
                 _ =
                     Debug.log "api error" error
             in
-                text "We're having trouble contacting YNAB. Try connecting to YNAB again."
+                "We're having trouble contacting YNAB."
 
         InvalidRoute ->
-            text "Something in your browser is funky. Try connecting to YNAB again."
+            "Something in your browser is funky."
 
         ImpossibleState ->
-            text "How did you get here?!?!"
+            "How did you get here?!?!"
+
+
+alert : String -> Html Update.Msg
+alert str =
+    Alert.simpleDanger []
+        [ text (str ++ " ")
+        , Alert.link [ href "/" ] [ text "Try connecting to YNAB again." ]
+        ]
