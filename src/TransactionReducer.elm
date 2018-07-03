@@ -56,7 +56,7 @@ applyCategory : Filter CategoryFilter -> Transaction -> Bool
 applyCategory categoryFilter transaction =
     case categoryFilter of
         Inactive ->
-            False
+            True
 
         Active (CategoryFilter category) ->
             transaction.category
