@@ -1,6 +1,7 @@
 module Styling exposing (..)
 
 import Html exposing (..)
+import Html.Attributes exposing (..)
 import Update exposing (Msg)
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
@@ -33,3 +34,12 @@ titleWithText str =
 title : Html Msg
 title =
     titleWithText "I Would Have Saved..."
+
+
+selectorLabel : String -> Html Msg
+selectorLabel str =
+    label
+        [ class "lead"
+        , Spacing.mr2
+        ]
+        [ text str ]

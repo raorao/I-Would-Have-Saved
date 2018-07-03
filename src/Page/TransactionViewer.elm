@@ -7,35 +7,36 @@ import TransactionReducer
 import Dropdown
 import DatePicker
 import Round
+import Styling
+import Bootstrap.Utilities.Spacing as Spacing
 
 
 view : Model.TransactionViewerData -> Html Msg
 view { filters, datePicker, transactions } =
     div []
-        [ h2 [] [ text "I Would Have Saved..." ]
-        , viewSavings filters transactions
-        , viewAdjustmentSelector
-        , viewCategorySelector transactions
-        , viewSinceSelector datePicker filters
+        [ Styling.title
+        , Styling.titleWithText (viewSavings filters transactions)
+        , Styling.row [ viewAdjustmentSelector ]
+        , Styling.row [ viewCategorySelector transactions ]
+        , Styling.row [ viewSinceSelector datePicker filters ]
         ]
 
 
-viewSavings : Model.Filters -> List Model.Transaction -> Html Msg
+viewSavings : Model.Filters -> List Model.Transaction -> String
 viewSavings filters transactions =
     transactions
         |> TransactionReducer.savings filters
         |> Round.round 2
         |> (++) "$"
-        |> text
-        |> List.singleton
-        |> div []
 
 
 viewAdjustmentSelector : Html Msg
 viewAdjustmentSelector =
     div
         []
-        [ label [] [ text "If I Spent " ], viewAdjustmentDropdown ]
+        [ Styling.selectorLabel "If I Spent"
+        , viewAdjustmentDropdown
+        ]
 
 
 viewAdjustmentDropdown : Html Msg
@@ -82,7 +83,7 @@ viewCategorySelector : List Model.Transaction -> Html Msg
 viewCategorySelector transactions =
     div
         []
-        [ label [] [ text "On " ], viewCategoryDropdown transactions ]
+        [ Styling.selectorLabel "On", viewCategoryDropdown transactions ]
 
 
 viewCategoryDropdown : List Model.Transaction -> Html Msg
@@ -122,7 +123,7 @@ selectCategory selection =
 viewSinceSelector : DatePicker.DatePicker -> Model.Filters -> Html Update.Msg
 viewSinceSelector datePicker filters =
     div []
-        [ text "Since "
+        [ Styling.selectorLabel "Since"
         , viewSinceDatePicker datePicker filters.since
         ]
 
