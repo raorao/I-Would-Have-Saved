@@ -11,6 +11,7 @@ import Styling
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Button as Button
 import Bootstrap.Utilities.Flex as Flex
+import Bootstrap.Utilities.Spacing as Spacing
 
 
 view : Model.TransactionViewerData -> Html Msg
@@ -18,9 +19,11 @@ view { filters, datePicker, transactions, viewState } =
     div []
         [ Styling.title
         , Styling.titleWithText (viewSavings filters transactions)
-        , Styling.row [ viewAdjustmentSelector filters viewState.adjustmentDropdown ]
-        , Styling.row [ viewCategorySelector transactions filters viewState.categoryDropdown ]
-        , Styling.row [ viewSinceSelector datePicker filters ]
+        , selectorRow "If I Spent"
+            [ viewAdjustmentDropdown filters viewState.adjustmentDropdown ]
+        , selectorRow "On"
+            [ viewCategoryDropdown transactions filters viewState.categoryDropdown ]
+        , selectorRow "Since" [ viewSinceDatePicker datePicker filters.since ]
         ]
 
 
@@ -32,29 +35,13 @@ viewSavings filters transactions =
         |> (++) "$"
 
 
-viewAdjustmentSelector : Model.Filters -> Dropdown.State -> Html Msg
-viewAdjustmentSelector filters dropdown =
-    div
-        [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter ]
-        [ Styling.selectorLabel "If I Spent"
-        , viewAdjustmentDropdown filters dropdown
+selectorRow : String -> List (Html Msg) -> Html Msg
+selectorRow title children =
+    Styling.row
+        [ div
+            [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter, Spacing.my1 ]
+            ([ Styling.selectorLabel title ] ++ children)
         ]
-
-
-adjustmentFilterString : Model.AdjustmentFilter -> String
-adjustmentFilterString adjustmentFilter =
-    case adjustmentFilter of
-        Model.TenPercent ->
-            "10% less"
-
-        Model.TwentyFivePercent ->
-            "25% less"
-
-        Model.HalfAsMuch ->
-            "half as much"
-
-        Model.NothingAtAll ->
-            "nothing"
 
 
 viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
@@ -98,11 +85,20 @@ adjustmentDropdownItem adjustmentFilter =
         [ text (adjustmentFilterString adjustmentFilter) ]
 
 
-viewCategorySelector : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
-viewCategorySelector transactions filters dropdown =
-    div
-        [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter ]
-        [ Styling.selectorLabel "On", viewCategoryDropdown transactions filters dropdown ]
+adjustmentFilterString : Model.AdjustmentFilter -> String
+adjustmentFilterString adjustmentFilter =
+    case adjustmentFilter of
+        Model.TenPercent ->
+            "10% less"
+
+        Model.TwentyFivePercent ->
+            "25% less"
+
+        Model.HalfAsMuch ->
+            "half as much"
+
+        Model.NothingAtAll ->
+            "nothing"
 
 
 viewCategoryDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
@@ -138,14 +134,6 @@ categoryDropdownItem category =
     Dropdown.buttonItem
         [ onClick (Update.CategorySelected (Model.CategoryFilter category)) ]
         [ text category ]
-
-
-viewSinceSelector : DatePicker.DatePicker -> Model.Filters -> Html Update.Msg
-viewSinceSelector datePicker filters =
-    div []
-        [ Styling.selectorLabel "Since"
-        , viewSinceDatePicker datePicker filters.since
-        ]
 
 
 viewSinceDatePicker : DatePicker.DatePicker -> Model.Filter Model.SinceFilter -> Html Update.Msg
