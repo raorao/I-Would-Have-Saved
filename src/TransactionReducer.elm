@@ -19,9 +19,11 @@ savings filters transactions =
         |> toDollars
 
 
-categories : List Transaction -> List String
-categories transactions =
+categories : Filters -> List Transaction -> List String
+categories filters transactions =
     transactions
+        |> List.filter (applyPayee filters.payee)
+        |> List.filter (applySince filters.since)
         |> List.map .category
         |> List.filter isVisibleCategory
         |> List.filterMap identity
@@ -29,9 +31,11 @@ categories transactions =
         |> List.sort
 
 
-payees : List Transaction -> List String
-payees transactions =
+payees : Filters -> List Transaction -> List String
+payees filters transactions =
     transactions
+        |> List.filter (applyCategory filters.category)
+        |> List.filter (applySince filters.since)
         |> List.map .payee
         |> List.filterMap identity
         |> List.Extra.unique

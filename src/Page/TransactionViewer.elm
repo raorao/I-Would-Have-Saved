@@ -13,11 +13,9 @@ import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Button as Button
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
-import Bootstrap.Utilities.Size as Size
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
-import Bootstrap.Text as Text
 
 
 view : Model.TransactionViewerData -> Html Msg
@@ -123,10 +121,10 @@ adjustmentFilterString adjustmentFilter =
 
 
 viewCategoryDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
-viewCategoryDropdown transactions { category } dropdown =
+viewCategoryDropdown transactions filters dropdown =
     let
         categoryName =
-            case category of
+            case filters.category of
                 Model.Active (Model.CategoryFilter category) ->
                     category
 
@@ -139,14 +137,14 @@ viewCategoryDropdown transactions { category } dropdown =
             , toggleMsg = (Update.DropdownMsg Model.CategoryDropdown)
             , toggleButton =
                 Dropdown.toggle [ Button.primary, Button.large ] [ text categoryName ]
-            , items = categoryDropdownItems transactions
+            , items = categoryDropdownItems filters transactions
             }
 
 
-categoryDropdownItems : List Model.Transaction -> List (Dropdown.DropdownItem Msg)
-categoryDropdownItems transactions =
+categoryDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
+categoryDropdownItems filters transactions =
     transactions
-        |> TransactionReducer.categories
+        |> TransactionReducer.categories filters
         |> List.map categoryDropdownItem
 
 
@@ -158,10 +156,10 @@ categoryDropdownItem category =
 
 
 viewPayeeDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
-viewPayeeDropdown transactions { payee } dropdown =
+viewPayeeDropdown transactions filters dropdown =
     let
         payeeName =
-            case payee of
+            case filters.payee of
                 Model.Active (Model.PayeeFilter payee) ->
                     payee
 
@@ -174,14 +172,14 @@ viewPayeeDropdown transactions { payee } dropdown =
             , toggleMsg = (Update.DropdownMsg Model.PayeeDropdown)
             , toggleButton =
                 Dropdown.toggle [ Button.primary, Button.large ] [ text payeeName ]
-            , items = payeeDropdownItems transactions
+            , items = payeeDropdownItems filters transactions
             }
 
 
-payeeDropdownItems : List Model.Transaction -> List (Dropdown.DropdownItem Msg)
-payeeDropdownItems transactions =
+payeeDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
+payeeDropdownItems filters transactions =
     transactions
-        |> TransactionReducer.payees
+        |> TransactionReducer.payees filters
         |> List.map payeeDropdownItem
 
 
