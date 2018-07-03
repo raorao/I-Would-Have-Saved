@@ -22,8 +22,18 @@ type ErrorType
 type alias TransactionViewerData =
     { transactions : List Transaction
     , filters : Filters
-    , dropdown : Dropdown.State
+    , viewState : TransactionViewerViewState
     , datePicker : DatePicker.DatePicker
+    }
+
+
+type TransactionViewerDropdown
+    = CategoryDropdown
+    | AdjustmentDropdown
+
+
+type alias TransactionViewerViewState =
+    { adjustmentDropdown : Dropdown.State
     }
 
 

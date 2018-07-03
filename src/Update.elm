@@ -21,7 +21,7 @@ type Msg
     | CategorySelected CategoryFilter
     | AdjustmentSelected AdjustmentFilter
     | SetDatePicker DatePicker.Msg
-    | DropdownMsg Dropdown.State
+    | DropdownMsg Model.TransactionViewerDropdown Dropdown.State
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,7 +60,7 @@ update msg model =
                 ( TransactionViewer
                     { transactions = transactions
                     , datePicker = datePicker
-                    , dropdown = Dropdown.initialState
+                    , viewState = { adjustmentDropdown = Dropdown.initialState }
                     , filters = emptyFilters
                     }
                 , datePickerCmd
@@ -129,10 +129,16 @@ update msg model =
                 , Cmd.map SetDatePicker datePickerCmd
                 )
 
-        ( TransactionViewer pageData, DropdownMsg dropdown ) ->
+        ( TransactionViewer pageData, DropdownMsg _ adjustmentDropdown ) ->
             let
+                viewState =
+                    pageData.viewState
+
+                newViewState =
+                    { viewState | adjustmentDropdown = adjustmentDropdown }
+
                 newPageData =
-                    { pageData | dropdown = dropdown }
+                    { pageData | viewState = newViewState }
             in
                 ( TransactionViewer newPageData, Cmd.none )
 

@@ -15,11 +15,11 @@ import Bootstrap.Utilities.Flex as Flex
 
 
 view : Model.TransactionViewerData -> Html Msg
-view { filters, datePicker, transactions, dropdown } =
+view { filters, datePicker, transactions, viewState } =
     div []
         [ Styling.title
         , Styling.titleWithText (viewSavings filters transactions)
-        , Styling.row [ viewAdjustmentSelector filters dropdown ]
+        , Styling.row [ viewAdjustmentSelector filters viewState.adjustmentDropdown ]
         , Styling.row [ viewCategorySelector transactions ]
         , Styling.row [ viewSinceSelector datePicker filters ]
         ]
@@ -72,7 +72,7 @@ viewAdjustmentDropdown { adjustment } dropdown =
         BDropdown.dropdown
             dropdown
             { options = []
-            , toggleMsg = Update.DropdownMsg
+            , toggleMsg = (Update.DropdownMsg Model.AdjustmentDropdown)
             , toggleButton =
                 BDropdown.toggle [ Button.primary ] [ text adjustmentName ]
             , items = adjustmentDropdownItems

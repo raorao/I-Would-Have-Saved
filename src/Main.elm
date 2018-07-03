@@ -36,8 +36,12 @@ main =
 subscriptions : Model.Model -> Sub Update.Msg
 subscriptions model =
     case model of
-        Model.TransactionViewer { dropdown } ->
-            Sub.batch [ Dropdown.subscriptions dropdown Update.DropdownMsg ]
+        Model.TransactionViewer { viewState } ->
+            Sub.batch
+                [ Dropdown.subscriptions
+                    viewState.adjustmentDropdown
+                    (Update.DropdownMsg Model.AdjustmentDropdown)
+                ]
 
         _ ->
             Sub.none
