@@ -8,7 +8,6 @@ import Dropdown
 import DatePicker
 import Round
 import Styling
-import Bootstrap.Utilities.Spacing as Spacing
 
 
 view : Model.TransactionViewerData -> Html Msg
