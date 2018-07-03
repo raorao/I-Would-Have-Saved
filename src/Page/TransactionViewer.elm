@@ -2,7 +2,7 @@ module Page.TransactionViewer exposing (..)
 
 import Model
 import Html exposing (..)
-import Html.Attributes exposing (class)
+import Html.Attributes exposing (class, style)
 import Html.Events exposing (onClick)
 import Update exposing (Msg)
 import TransactionReducer
@@ -13,6 +13,11 @@ import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Button as Button
 import Bootstrap.Utilities.Flex as Flex
 import Bootstrap.Utilities.Spacing as Spacing
+import Bootstrap.Utilities.Size as Size
+import Bootstrap.Grid as Grid
+import Bootstrap.Grid.Col as Col
+import Bootstrap.Grid.Row as Row
+import Bootstrap.Text as Text
 
 
 view : Model.TransactionViewerData -> Html Msg
@@ -40,29 +45,24 @@ viewSavings filters transactions =
 
 selectorRow : String -> List (Html Msg) -> Html Msg
 selectorRow title children =
-    Styling.row
-        [ div
-            [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter, Spacing.my1 ]
-            ([ label
-                [ class "lead"
-                , Spacing.mr2
-                , Spacing.mb0
+    Grid.row
+        [ Row.centerMd, Row.centerSm, (Row.attrs [ Flex.alignItemsCenter, Spacing.mb2 ]) ]
+        [ Grid.col ([ Col.xs5 ])
+            [ div
+                [ Flex.block, Flex.justifyEnd, Flex.alignItemsCenter ]
+                [ label
+                    [ class "lead"
+                    , Spacing.mb0
+                    ]
+                    [ text title ]
                 ]
-                [ text title ]
-             ]
-                ++ children
-            )
+            ]
+        , Grid.col ([ Col.xs5 ])
+            [ div
+                [ Flex.block, Flex.justifyStart, Flex.alignItemsCenter ]
+                children
+            ]
         ]
-
-
-selectorLabel : String -> Html Msg
-selectorLabel str =
-    label
-        [ class "lead"
-        , Spacing.mr2
-        , Spacing.mb0
-        ]
-        [ text str ]
 
 
 viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
