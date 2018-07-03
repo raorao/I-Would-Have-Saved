@@ -1,4 +1,6 @@
 import './main.css';
+import './elm-datepicker.css'
+
 import { Main } from './Main.elm';
 import registerServiceWorker from './registerServiceWorker';
 
