@@ -2,20 +2,24 @@ module Page.TransactionViewer exposing (..)
 
 import Model
 import Html exposing (..)
+import Html.Events exposing (onClick)
 import Update exposing (Msg)
 import TransactionReducer
 import Dropdown
 import DatePicker
 import Round
 import Styling
+import Bootstrap.Dropdown as BDropdown
+import Bootstrap.Button as Button
+import Bootstrap.Utilities.Flex as Flex
 
 
 view : Model.TransactionViewerData -> Html Msg
-view { filters, datePicker, transactions } =
+view { filters, datePicker, transactions, dropdown } =
     div []
         [ Styling.title
         , Styling.titleWithText (viewSavings filters transactions)
-        , Styling.row [ viewAdjustmentSelector ]
+        , Styling.row [ viewAdjustmentSelector filters dropdown ]
         , Styling.row [ viewCategorySelector transactions ]
         , Styling.row [ viewSinceSelector datePicker filters ]
         ]
@@ -29,53 +33,70 @@ viewSavings filters transactions =
         |> (++) "$"
 
 
-viewAdjustmentSelector : Html Msg
-viewAdjustmentSelector =
+viewAdjustmentSelector : Model.Filters -> BDropdown.State -> Html Msg
+viewAdjustmentSelector filters dropdown =
     div
-        []
+        [ Flex.block, Flex.justifyCenter, Flex.alignItemsCenter ]
         [ Styling.selectorLabel "If I Spent"
-        , viewAdjustmentDropdown
+        , viewAdjustmentDropdown filters dropdown
         ]
 
 
-viewAdjustmentDropdown : Html Msg
-viewAdjustmentDropdown =
-    Dropdown.dropdown
-        (Dropdown.Options
-            adjustmentDropdownItems
-            (Just (Dropdown.Item "Adjustment" "Adjustment" False))
-            selectAdjustment
-        )
-        []
-        (Just "Adjustment")
+adjustmentFilterString : Model.AdjustmentFilter -> String
+adjustmentFilterString adjustmentFilter =
+    case adjustmentFilter of
+        Model.TenPercent ->
+            "10% less"
+
+        Model.TwentyFivePercent ->
+            "25% less"
+
+        Model.HalfAsMuch ->
+            "half as much"
+
+        Model.NothingAtAll ->
+            "nothing"
 
 
-adjustmentDropdownItems : List Dropdown.Item
+viewAdjustmentDropdown : Model.Filters -> BDropdown.State -> Html Msg
+viewAdjustmentDropdown { adjustment } dropdown =
+    let
+        adjustmentName =
+            case adjustment of
+                Model.Active adjustmentFilter ->
+                    adjustmentFilterString adjustmentFilter
+
+                Model.Inactive ->
+                    "..."
+    in
+        BDropdown.dropdown
+            dropdown
+            { options = []
+            , toggleMsg = Update.DropdownMsg
+            , toggleButton =
+                BDropdown.toggle [ Button.primary ] [ text adjustmentName ]
+            , items = adjustmentDropdownItems
+            }
+
+
+adjustmentDropdownItems : List (BDropdown.DropdownItem Msg)
 adjustmentDropdownItems =
     let
         options =
-            [ "10% less", "25% less", "half as much", "nothing" ]
+            [ Model.TenPercent
+            , Model.TwentyFivePercent
+            , Model.HalfAsMuch
+            , Model.NothingAtAll
+            ]
     in
-        List.map enabledDropdownItem options
+        List.map adjustmentDropdownItem options
 
 
-selectAdjustment : Maybe String -> Update.Msg
-selectAdjustment selection =
-    case selection of
-        Just "10% less" ->
-            Update.AdjustmentSelected (Model.AdjustmentFilter 0.1)
-
-        Just "25% less" ->
-            Update.AdjustmentSelected (Model.AdjustmentFilter 0.25)
-
-        Just "half as much" ->
-            Update.AdjustmentSelected (Model.AdjustmentFilter 0.5)
-
-        Just "nothing" ->
-            Update.AdjustmentSelected (Model.AdjustmentFilter 1.0)
-
-        _ ->
-            Update.NoOp
+adjustmentDropdownItem : Model.AdjustmentFilter -> BDropdown.DropdownItem Msg
+adjustmentDropdownItem adjustmentFilter =
+    BDropdown.buttonItem
+        [ onClick (Update.AdjustmentSelected adjustmentFilter) ]
+        [ text (adjustmentFilterString adjustmentFilter) ]
 
 
 viewCategorySelector : List Model.Transaction -> Html Msg

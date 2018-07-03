@@ -41,5 +41,6 @@ selectorLabel str =
     label
         [ class "lead"
         , Spacing.mr2
+        , Spacing.mb0
         ]
         [ text str ]

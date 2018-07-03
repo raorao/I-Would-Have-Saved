@@ -3,6 +3,7 @@ module Model exposing (..)
 import Date exposing (Date)
 import DatePicker
 import Http
+import Bootstrap.Dropdown as Dropdown
 
 
 type alias Config =
@@ -21,6 +22,7 @@ type ErrorType
 type alias TransactionViewerData =
     { transactions : List Transaction
     , filters : Filters
+    , dropdown : Dropdown.State
     , datePicker : DatePicker.DatePicker
     }
 
@@ -53,7 +55,10 @@ type SinceFilter
 
 
 type AdjustmentFilter
-    = AdjustmentFilter Float
+    = HalfAsMuch
+    | TenPercent
+    | TwentyFivePercent
+    | NothingAtAll
 
 
 type Filter f

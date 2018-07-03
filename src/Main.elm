@@ -5,7 +5,7 @@ import Router
 import Model
 import Update exposing (Msg(..))
 import View
-import Task
+import Bootstrap.Dropdown as Dropdown
 
 
 init : Model.Config -> Navigation.Location -> ( Model.Model, Cmd Update.Msg )
@@ -29,5 +29,15 @@ main =
         { view = View.view
         , init = init
         , update = Update.update
-        , subscriptions = always Sub.none
+        , subscriptions = subscriptions
         }
+
+
+subscriptions : Model.Model -> Sub Update.Msg
+subscriptions model =
+    case model of
+        Model.TransactionViewer { dropdown } ->
+            Sub.batch [ Dropdown.subscriptions dropdown Update.DropdownMsg ]
+
+        _ ->
+            Sub.none

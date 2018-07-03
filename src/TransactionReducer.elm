@@ -31,8 +31,17 @@ categories transactions =
 applyAdjustment : Filter AdjustmentFilter -> Float -> Float
 applyAdjustment adjustment currentSavings =
     case adjustment of
-        Active (AdjustmentFilter val) ->
-            val * currentSavings
+        Active TenPercent ->
+            0.1 * currentSavings
+
+        Active TwentyFivePercent ->
+            0.25 * currentSavings
+
+        Active HalfAsMuch ->
+            0.5 * currentSavings
+
+        Active NothingAtAll ->
+            1.0 * currentSavings
 
         Inactive ->
             currentSavings

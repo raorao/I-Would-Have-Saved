@@ -5,6 +5,7 @@ import Http
 import Ynab
 import Task
 import DatePicker
+import Bootstrap.Dropdown as Dropdown
 
 
 --import Result
@@ -20,6 +21,7 @@ type Msg
     | CategorySelected CategoryFilter
     | AdjustmentSelected AdjustmentFilter
     | SetDatePicker DatePicker.Msg
+    | DropdownMsg Dropdown.State
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -58,6 +60,7 @@ update msg model =
                 ( TransactionViewer
                     { transactions = transactions
                     , datePicker = datePicker
+                    , dropdown = Dropdown.initialState
                     , filters = emptyFilters
                     }
                 , datePickerCmd
@@ -125,6 +128,13 @@ update msg model =
                 ( TransactionViewer newPageData
                 , Cmd.map SetDatePicker datePickerCmd
                 )
+
+        ( TransactionViewer pageData, DropdownMsg dropdown ) ->
+            let
+                newPageData =
+                    { pageData | dropdown = dropdown }
+            in
+                ( TransactionViewer newPageData, Cmd.none )
 
         ( _, NoOp ) ->
             ( model, Cmd.none )
