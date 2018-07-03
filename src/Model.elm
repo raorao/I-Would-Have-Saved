@@ -52,14 +52,19 @@ type SinceFilter
     = SinceFilter Date
 
 
-type Adjustment
-    = Adjustment Float
+type AdjustmentFilter
+    = AdjustmentFilter Float
+
+
+type Filter f
+    = Inactive
+    | Active f
 
 
 type alias Filters =
-    { category : Maybe CategoryFilter
-    , since : Maybe SinceFilter
-    , adjustment : Maybe Adjustment
+    { category : Filter CategoryFilter
+    , since : Filter SinceFilter
+    , adjustment : Filter AdjustmentFilter
     }
 
 
@@ -88,4 +93,4 @@ type alias Transaction =
 
 emptyFilters : Filters
 emptyFilters =
-    Filters Nothing Nothing Nothing
+    Filters Inactive Inactive Inactive

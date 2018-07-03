@@ -64,16 +64,16 @@ selectAdjustment : Maybe String -> Update.Msg
 selectAdjustment selection =
     case selection of
         Just "10% less" ->
-            Update.AdjustmentSelected (Model.Adjustment 0.1)
+            Update.AdjustmentSelected (Model.AdjustmentFilter 0.1)
 
         Just "25% less" ->
-            Update.AdjustmentSelected (Model.Adjustment 0.25)
+            Update.AdjustmentSelected (Model.AdjustmentFilter 0.25)
 
         Just "half as much" ->
-            Update.AdjustmentSelected (Model.Adjustment 0.5)
+            Update.AdjustmentSelected (Model.AdjustmentFilter 0.5)
 
         Just "nothing" ->
-            Update.AdjustmentSelected (Model.Adjustment 1.0)
+            Update.AdjustmentSelected (Model.AdjustmentFilter 1.0)
 
         _ ->
             Update.NoOp
@@ -128,15 +128,15 @@ viewSinceSelector datePicker filters =
         ]
 
 
-viewSinceDatePicker : DatePicker.DatePicker -> Maybe Model.SinceFilter -> Html Update.Msg
+viewSinceDatePicker : DatePicker.DatePicker -> Model.Filter Model.SinceFilter -> Html Update.Msg
 viewSinceDatePicker datePicker currentSince =
     let
         selected =
             case currentSince of
-                Just (Model.SinceFilter date) ->
+                Model.Active (Model.SinceFilter date) ->
                     Just date
 
-                _ ->
+                Model.Inactive ->
                     Nothing
     in
         DatePicker.view

@@ -18,7 +18,7 @@ type Msg
     | TransactionsFetched (Result Http.Error (List Transaction))
     | SelectBudget Budget
     | CategorySelected CategoryFilter
-    | AdjustmentSelected Adjustment
+    | AdjustmentSelected AdjustmentFilter
     | SetDatePicker DatePicker.Msg
 
 
@@ -77,7 +77,7 @@ update msg model =
                     pageData.filters
 
                 newFilters =
-                    { filters | category = Just categoryFilter }
+                    { filters | category = Active categoryFilter }
 
                 newPageData =
                     { pageData | filters = newFilters }
@@ -90,7 +90,7 @@ update msg model =
                     pageData.filters
 
                 newFilters =
-                    { filters | adjustment = Just adjustmentFilter }
+                    { filters | adjustment = Active adjustmentFilter }
 
                 newPageData =
                     { pageData | filters = newFilters }
@@ -105,19 +105,19 @@ update msg model =
                         msg
                         pageData.datePicker
 
-                date =
+                since =
                     case dateEvent of
                         DatePicker.Changed (Just newDate) ->
-                            Just (SinceFilter newDate)
+                            Active (SinceFilter newDate)
 
                         _ ->
-                            Nothing
+                            Inactive
 
                 filters =
                     pageData.filters
 
                 newFilters =
-                    { filters | since = date }
+                    { filters | since = since }
 
                 newPageData =
                     { pageData | filters = newFilters, datePicker = newDatePicker }

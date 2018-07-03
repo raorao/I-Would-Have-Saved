@@ -28,13 +28,13 @@ categories transactions =
         |> List.sort
 
 
-applyAdjustment : Maybe Adjustment -> Float -> Float
+applyAdjustment : Filter AdjustmentFilter -> Float -> Float
 applyAdjustment adjustment currentSavings =
     case adjustment of
-        Just (Adjustment val) ->
+        Active (AdjustmentFilter val) ->
             val * currentSavings
 
-        Nothing ->
+        Inactive ->
             currentSavings
 
 
@@ -43,24 +43,26 @@ toDollars amount =
     -amount / 1000.0
 
 
-applyCategory : Maybe CategoryFilter -> Transaction -> Bool
+applyCategory : Filter CategoryFilter -> Transaction -> Bool
 applyCategory categoryFilter transaction =
-    let
-        matches (CategoryFilter filterCategory) transactionCategory =
-            filterCategory == transactionCategory
-    in
-        Maybe.map2 matches categoryFilter transaction.category
-            |> Maybe.withDefault False
+    case categoryFilter of
+        Inactive ->
+            False
+
+        Active (CategoryFilter category) ->
+            transaction.category
+                |> Maybe.map ((==) category)
+                |> Maybe.withDefault False
 
 
-applySince : Maybe SinceFilter -> Transaction -> Bool
+applySince : Filter SinceFilter -> Transaction -> Bool
 applySince sinceFilter transaction =
     case sinceFilter of
-        Just (SinceFilter since) ->
+        Active (SinceFilter since) ->
             DateCompare.is
                 DateCompare.SameOrAfter
                 transaction.date
                 since
 
-        Nothing ->
+        Inactive ->
             True
