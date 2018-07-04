@@ -16,8 +16,7 @@ import Bootstrap.Utilities.Spacing as Spacing
 view : Model -> Html Msg
 view model =
     Grid.containerFluid [ Spacing.mt4 ]
-        [ CDN.stylesheet
-        , (pageView model)
+        [ pageView model
         ]
 
 
