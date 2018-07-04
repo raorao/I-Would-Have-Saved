@@ -45,10 +45,10 @@ viewSavings filters transactions =
 selectorRow : String -> List (Html Msg) -> Html Msg
 selectorRow title children =
     Grid.row
-        [ Row.centerMd, Row.centerSm, (Row.attrs [ Flex.alignItemsCenter, Spacing.mb2 ]) ]
-        [ Grid.col ([ Col.xs5 ])
+        [ Row.centerXs, (Row.attrs [ Flex.alignItemsCenter, Spacing.mb2 ]) ]
+        [ Grid.col ([ Col.md5, Col.sm8 ])
             [ div
-                [ Flex.block, Flex.justifyEnd, Flex.alignItemsCenter ]
+                [ Flex.block, Flex.justifyEndMd, Flex.justifyCenter, Flex.alignItemsCenter ]
                 [ label
                     [ class "lead"
                     , Spacing.mb0
@@ -56,9 +56,9 @@ selectorRow title children =
                     [ text title ]
                 ]
             ]
-        , Grid.col ([ Col.xs5 ])
+        , Grid.col ([ Col.md5, Col.sm8 ])
             [ div
-                [ Flex.block, Flex.justifyStart, Flex.alignItemsCenter ]
+                [ Flex.block, Flex.justifyStartMd, Flex.justifyCenter, Flex.alignItemsCenter ]
                 children
             ]
         ]

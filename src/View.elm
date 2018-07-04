@@ -1,6 +1,7 @@
 module View exposing (view)
 
 import Html exposing (Html)
+import Html.Attributes
 import Model exposing (Model(..))
 import Update exposing (Msg)
 import Page.Loading
@@ -15,7 +16,7 @@ import Bootstrap.Utilities.Spacing as Spacing
 
 view : Model -> Html Msg
 view model =
-    Grid.containerFluid [ Spacing.mt4 ]
+    Grid.containerFluid [ Spacing.mt4, Html.Attributes.style [ ( "padding", "0" ) ] ]
         [ pageView model
         ]
 

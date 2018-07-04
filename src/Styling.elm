@@ -26,7 +26,8 @@ row =
 
 titleWithText : String -> Html Msg
 titleWithText str =
-    row
+    rowWithColOptions
+        [ Col.lg12, Col.sm12 ]
         [ h1 [ Spacing.mb4 ] [ text str ] ]
 
 
