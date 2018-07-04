@@ -13,7 +13,7 @@ default transactions =
             DatePicker.defaultSettings
     in
         { defaultSettings
-            | placeholder = "..."
+            | placeholder = "Account Inception"
             , isDisabled = (TransactionReducer.isBetweenDates transactions)
             , inputAttributes =
                 [ Html.Attributes.class "form-control form-control-lg"
