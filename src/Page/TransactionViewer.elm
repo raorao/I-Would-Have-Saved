@@ -8,7 +8,6 @@ import Update exposing (Msg)
 import TransactionReducer
 import DatePicker
 import DatePickerSettings
-import Round
 import Styling
 import Bootstrap.Dropdown as Dropdown
 import Bootstrap.Button as Button
@@ -17,6 +16,8 @@ import Bootstrap.Utilities.Spacing as Spacing
 import Bootstrap.Grid as Grid
 import Bootstrap.Grid.Col as Col
 import Bootstrap.Grid.Row as Row
+import FormatNumber
+import FormatNumber.Locales
 
 
 view : Model.TransactionViewerData -> Html Msg
@@ -38,7 +39,7 @@ viewSavings : Model.Filters -> List Model.Transaction -> String
 viewSavings filters transactions =
     transactions
         |> TransactionReducer.savings filters
-        |> Round.round 2
+        |> FormatNumber.format FormatNumber.Locales.usLocale
         |> (++) "$"
 
 
