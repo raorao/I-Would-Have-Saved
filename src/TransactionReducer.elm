@@ -70,9 +70,6 @@ applyAdjustment adjustment currentSavings =
         Active HalfAsMuch ->
             0.5 * currentSavings
 
-        Active NothingAtAll ->
-            1.0 * currentSavings
-
         Inactive ->
             currentSavings
 

@@ -76,7 +76,6 @@ type AdjustmentFilter
     = HalfAsMuch
     | TenPercent
     | TwentyFivePercent
-    | NothingAtAll
 
 
 type Filter f

@@ -65,59 +65,51 @@ selectorRow title children =
 
 viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
 viewAdjustmentDropdown { adjustment } dropdown =
-    let
-        adjustmentName =
-            case adjustment of
-                Model.Active adjustmentFilter ->
-                    adjustmentFilterString adjustmentFilter
-
-                Model.Inactive ->
-                    "..."
-    in
-        Dropdown.dropdown
-            dropdown
-            { options = []
-            , toggleMsg = (Update.DropdownMsg Model.AdjustmentDropdown)
-            , toggleButton =
-                Dropdown.toggle [ Button.primary, Button.large ] [ text adjustmentName ]
-            , items = adjustmentDropdownItems
-            }
+    Dropdown.dropdown
+        dropdown
+        { options = []
+        , toggleMsg = (Update.DropdownMsg Model.AdjustmentDropdown)
+        , toggleButton =
+            Dropdown.toggle [ Button.primary, Button.large ] [ text (adjustmentFilterString adjustment) ]
+        , items = adjustmentDropdownItems
+        }
 
 
 adjustmentDropdownItems : List (Dropdown.DropdownItem Msg)
 adjustmentDropdownItems =
     let
-        options =
-            [ Model.TenPercent
-            , Model.TwentyFivePercent
-            , Model.HalfAsMuch
-            , Model.NothingAtAll
-            ]
+        unselectItem =
+            adjustmentDropdownItem Model.Inactive
+
+        adjustmentItems =
+            [ Model.TenPercent, Model.TwentyFivePercent, Model.HalfAsMuch ]
+                |> List.map Model.Active
+                |> List.map adjustmentDropdownItem
     in
-        List.map adjustmentDropdownItem options
+        [ unselectItem ] ++ [ Dropdown.divider ] ++ adjustmentItems
 
 
-adjustmentDropdownItem : Model.AdjustmentFilter -> Dropdown.DropdownItem Msg
-adjustmentDropdownItem adjustmentFilter =
+adjustmentDropdownItem : Model.Filter Model.AdjustmentFilter -> Dropdown.DropdownItem Msg
+adjustmentDropdownItem filter =
     Dropdown.buttonItem
-        [ onClick (Update.AdjustmentSelected (Model.Active adjustmentFilter)) ]
-        [ text (adjustmentFilterString adjustmentFilter) ]
+        [ onClick (Update.AdjustmentSelected filter) ]
+        [ text (adjustmentFilterString filter) ]
 
 
-adjustmentFilterString : Model.AdjustmentFilter -> String
-adjustmentFilterString adjustmentFilter =
-    case adjustmentFilter of
-        Model.TenPercent ->
+adjustmentFilterString : Model.Filter Model.AdjustmentFilter -> String
+adjustmentFilterString filter =
+    case filter of
+        Model.Active Model.TenPercent ->
             "10% less"
 
-        Model.TwentyFivePercent ->
+        Model.Active Model.TwentyFivePercent ->
             "25% less"
 
-        Model.HalfAsMuch ->
-            "half as much"
+        Model.Active Model.HalfAsMuch ->
+            "Half as much"
 
-        Model.NothingAtAll ->
-            "nothing"
+        Model.Inactive ->
+            "Nothing"
 
 
 viewCategoryDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
@@ -129,7 +121,7 @@ viewCategoryDropdown transactions filters dropdown =
                     category
 
                 Model.Inactive ->
-                    "..."
+                    "All Categories"
     in
         Dropdown.dropdown
             dropdown
@@ -143,16 +135,26 @@ viewCategoryDropdown transactions filters dropdown =
 
 categoryDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
 categoryDropdownItems filters transactions =
-    transactions
-        |> TransactionReducer.categories filters
-        |> List.map categoryDropdownItem
+    let
+        unselectItem =
+            categoryDropdownItem ( "All Categories", Model.Inactive )
+
+        categoryItems =
+            transactions
+                |> TransactionReducer.categories filters
+                |> List.map (\a -> ( a, a ))
+                |> List.map (Tuple.mapSecond Model.CategoryFilter)
+                |> List.map (Tuple.mapSecond Model.Active)
+                |> List.map categoryDropdownItem
+    in
+        [ unselectItem ] ++ [ Dropdown.divider ] ++ categoryItems
 
 
-categoryDropdownItem : String -> Dropdown.DropdownItem Msg
-categoryDropdownItem category =
+categoryDropdownItem : ( String, Model.Filter Model.CategoryFilter ) -> Dropdown.DropdownItem Msg
+categoryDropdownItem ( name, filter ) =
     Dropdown.buttonItem
-        [ onClick (Update.CategorySelected (Model.Active (Model.CategoryFilter category))) ]
-        [ text category ]
+        [ onClick (Update.CategorySelected filter) ]
+        [ text name ]
 
 
 viewPayeeDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
@@ -164,7 +166,7 @@ viewPayeeDropdown transactions filters dropdown =
                     payee
 
                 Model.Inactive ->
-                    "..."
+                    "All Payees"
     in
         Dropdown.dropdown
             dropdown
@@ -178,16 +180,26 @@ viewPayeeDropdown transactions filters dropdown =
 
 payeeDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
 payeeDropdownItems filters transactions =
-    transactions
-        |> TransactionReducer.payees filters
-        |> List.map payeeDropdownItem
+    let
+        unselectItem =
+            payeeDropdownItem ( "All Payees", Model.Inactive )
+
+        payeeItems =
+            transactions
+                |> TransactionReducer.payees filters
+                |> List.map (\a -> ( a, a ))
+                |> List.map (Tuple.mapSecond Model.PayeeFilter)
+                |> List.map (Tuple.mapSecond Model.Active)
+                |> List.map payeeDropdownItem
+    in
+        [ unselectItem ] ++ [ Dropdown.divider ] ++ payeeItems
 
 
-payeeDropdownItem : String -> Dropdown.DropdownItem Msg
-payeeDropdownItem payee =
+payeeDropdownItem : ( String, Model.Filter Model.PayeeFilter ) -> Dropdown.DropdownItem Msg
+payeeDropdownItem ( name, filter ) =
     Dropdown.buttonItem
-        [ onClick (Update.PayeeSelected (Model.Active (Model.PayeeFilter payee))) ]
-        [ text payee ]
+        [ onClick (Update.PayeeSelected filter) ]
+        [ text name ]
 
 
 viewSinceDatePicker : DatePicker.DatePicker -> Model.Filter Model.SinceFilter -> Html Update.Msg
