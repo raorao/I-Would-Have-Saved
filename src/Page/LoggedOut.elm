@@ -33,7 +33,8 @@ view config =
                 , a [ href "https://twitter.com/raorao_" ] [ text "@raorao" ]
                 , text " for the "
                 , a [ href "https://www.youneedabudget.com/contest-ynab-api/" ] [ text "YNAB API Contest" ]
-                , text "."
+                , text ". Source code available "
+                , a [ href "http://github.com/raorao/I-Would-Have-Saved" ] [ text "on GitHub." ]
                 ]
             ]
         ]
