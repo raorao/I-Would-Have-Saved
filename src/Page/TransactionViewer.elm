@@ -7,6 +7,7 @@ import Html.Events exposing (onClick)
 import Update exposing (Msg)
 import TransactionReducer
 import DatePicker
+import DatePickerSettings
 import Round
 import Styling
 import Bootstrap.Dropdown as Dropdown
@@ -29,7 +30,7 @@ view { filters, datePicker, transactions, viewState } =
             [ viewCategoryDropdown transactions filters viewState.categoryDropdown ]
         , selectorRow "At"
             [ viewPayeeDropdown transactions filters viewState.payeeDropdown ]
-        , selectorRow "Since" [ viewSinceDatePicker datePicker filters.since ]
+        , selectorRow "Since" [ viewSinceDatePicker datePicker transactions filters.since ]
         ]
 
 
@@ -202,8 +203,8 @@ payeeDropdownItem ( name, filter ) =
         [ text name ]
 
 
-viewSinceDatePicker : DatePicker.DatePicker -> Model.Filter Model.SinceFilter -> Html Update.Msg
-viewSinceDatePicker datePicker currentSince =
+viewSinceDatePicker : DatePicker.DatePicker -> List Model.Transaction -> Model.Filter Model.SinceFilter -> Html Update.Msg
+viewSinceDatePicker datePicker transactions currentSince =
     let
         selected =
             case currentSince of
@@ -215,6 +216,6 @@ viewSinceDatePicker datePicker currentSince =
     in
         DatePicker.view
             selected
-            Model.datePickerSettings
+            (DatePickerSettings.default transactions)
             datePicker
             |> Html.map Update.SetDatePicker

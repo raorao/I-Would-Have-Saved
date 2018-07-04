@@ -6,6 +6,7 @@ import Ynab
 import Task
 import DatePicker
 import Bootstrap.Dropdown as Dropdown
+import DatePickerSettings
 
 
 --import Result
@@ -118,7 +119,7 @@ update msg model =
             let
                 ( newDatePicker, datePickerCmd, dateEvent ) =
                     DatePicker.update
-                        Model.datePickerSettings
+                        (DatePickerSettings.default pageData.transactions)
                         msg
                         pageData.datePicker
 
