@@ -18,13 +18,23 @@ view config =
         [ Styling.title
         , Styling.row
             [ Button.linkButton
-                [ Button.info, Button.large, Button.attrs [ href (ynabURL config), Spacing.mb5 ] ]
+                [ Button.info, Button.large, Button.attrs [ href (ynabURL config), Spacing.mb5, Spacing.mt3 ] ]
                 [ text "Login to YNAB" ]
             ]
         , Styling.rowWithColOptions [ Col.textAlign Text.alignXsLeft ]
-            [ p [] [ text "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Nam libero justo laoreet sit amet." ]
-            , p [] [ text "Nec nam aliquam sem et tortor consequat id porta nibh. Non blandit massa enim nec dui nunc mattis. Id volutpat lacus laoreet non curabitur gravida. Lorem dolor sed viverra ipsum nunc aliquet bibendum. Nullam non nisi est sit amet facilisis." ]
-            , p [] [ text "Tincidunt arcu non sodales neque. Libero justo laoreet sit amet." ]
+            [ p []
+                [ b [] [ text "I Would Have Saved " ]
+                , text "helps you find out where your money is going. Using the power of your "
+                , a [ href "https://www.youneedabudget.com/" ] [ text "You Need A Budget" ]
+                , text " transaction history, you can figure out how, where, and when you're spending your money – and where you should cut back!"
+                ]
+            , p []
+                [ text "Made by "
+                , a [ href "https://twitter.com/raorao_" ] [ text "@raorao" ]
+                , text " for the "
+                , a [ href "https://www.youneedabudget.com/contest-ynab-api/" ] [ text "YNAB API Contest" ]
+                , text "."
+                ]
             ]
         ]
 
