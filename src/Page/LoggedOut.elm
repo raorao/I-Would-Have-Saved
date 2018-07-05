@@ -29,6 +29,11 @@ view config =
                 , text " transaction history, you can figure out how, where, and when you're spending your money – and where you should cut back!"
                 ]
             , p []
+                [ text "By using this application, you consent to our "
+                , a [ href "/privacy" ] [ text "privacy policy" ]
+                , text "."
+                ]
+            , p []
                 [ text "Made by "
                 , a [ href "https://twitter.com/raorao_" ] [ text "@raorao" ]
                 , text " for the "

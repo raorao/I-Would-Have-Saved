@@ -9,12 +9,14 @@ import Model exposing (AccessToken(..))
 type Route
     = LoggedOut
     | LoggedIn
+    | PrivacyPolicy
 
 
 routeTable : Parser (Route -> Route) Route
 routeTable =
     oneOf
         [ map LoggedIn (s "home")
+        , map PrivacyPolicy (s "privacy")
         , map LoggedOut top
         ]
 

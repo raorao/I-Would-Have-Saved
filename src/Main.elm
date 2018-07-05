@@ -14,6 +14,9 @@ init config location =
         ( Just Router.LoggedOut, _ ) ->
             ( Model.LoggedOut config, Cmd.none )
 
+        ( Just Router.PrivacyPolicy, _ ) ->
+            ( Model.PrivacyPolicy, Cmd.none )
+
         ( Just Router.LoggedIn, Just token ) ->
             ( Model.Loading Model.LoadingBudgets, (Update.send (FetchBudgets token)) )
 

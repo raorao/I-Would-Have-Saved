@@ -8,7 +8,7 @@ import Page.LoggedOut
 import Page.BudgetSelector
 import Page.TransactionViewer
 import Page.ErrorView
-import Bootstrap.CDN as CDN
+import Page.PrivacyPolicy
 import Bootstrap.Grid as Grid
 import Bootstrap.Utilities.Spacing as Spacing
 
@@ -37,3 +37,6 @@ pageView model =
 
         Error pageData ->
             Page.ErrorView.view pageData
+
+        PrivacyPolicy ->
+            Page.PrivacyPolicy.view

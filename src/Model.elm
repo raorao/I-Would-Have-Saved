@@ -57,6 +57,7 @@ type Model
     | TransactionViewer TransactionViewerData
     | LoggedOut Config
     | Error ErrorType
+    | PrivacyPolicy
 
 
 type CategoryFilter
