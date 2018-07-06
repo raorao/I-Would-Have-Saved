@@ -6,21 +6,34 @@ import Date exposing (Date)
 import Date.Extra.Compare as DateCompare
 
 
-savings : Filters -> List Transaction -> Float
-savings filters transactions =
-    transactions
-        |> List.filter (applySince filters.since)
-        |> List.filter (applyCategory filters.category)
-        |> List.filter (applyPayee filters.payee)
+applyFilter : FilterType -> Transaction -> Bool
+applyFilter filterType transaction =
+    case filterType of
+        CategoryFilter category ->
+            True
+
+        PayeeFilter payee ->
+            True
+
+        SinceFilter since ->
+            True
+
+        AdjustmentFilter val ->
+            True
+
+
+savings : List FilterType -> List Transaction -> Float
+savings filterTypes transactions =
+    filterTypes
+        |> List.foldr (List.filter applyFilter) transactions
         |> List.filter (.category >> isVisibleCategory)
         |> List.map .amount
         |> List.sum
         |> toFloat
-        |> applyAdjustment filters.adjustment
         |> toDollars
 
 
-categories : Filters -> List Transaction -> List String
+categories : List FilterType -> List Transaction -> List String
 categories filters transactions =
     transactions
         |> List.filter (applyPayee filters.payee)
@@ -32,7 +45,7 @@ categories filters transactions =
         |> List.sort
 
 
-payees : Filters -> List Transaction -> List String
+payees : List FilterType -> List Transaction -> List String
 payees filters transactions =
     transactions
         |> List.filter (applyCategory filters.category)
@@ -59,20 +72,17 @@ isVisibleCategory category =
             True
 
 
-applyAdjustment : Filter AdjustmentFilter -> Float -> Float
+applyAdjustment : AdjustmentFilterVal -> Float -> Float
 applyAdjustment adjustment currentSavings =
     case adjustment of
-        Active TenPercent ->
+        TenPercent ->
             0.1 * currentSavings
 
-        Active TwentyFivePercent ->
+        TwentyFivePercent ->
             0.25 * currentSavings
 
-        Active HalfAsMuch ->
+        HalfAsMuch ->
             0.5 * currentSavings
-
-        Inactive ->
-            currentSavings
 
 
 toDollars : Float -> Float
@@ -80,41 +90,26 @@ toDollars amount =
     -amount / 1000.0
 
 
-applyCategory : Filter CategoryFilter -> Transaction -> Bool
-applyCategory categoryFilter transaction =
-    case categoryFilter of
-        Inactive ->
-            True
-
-        Active (CategoryFilter category) ->
-            transaction.category
-                |> Maybe.map ((==) category)
-                |> Maybe.withDefault False
+applyCategory : String -> Transaction -> Bool
+applyCategory category transaction =
+    transaction.category
+        |> Maybe.map ((==) category)
+        |> Maybe.withDefault False
 
 
-applyPayee : Filter PayeeFilter -> Transaction -> Bool
-applyPayee payeeFilter transaction =
-    case payeeFilter of
-        Inactive ->
-            True
-
-        Active (PayeeFilter payee) ->
-            transaction.payee
-                |> Maybe.map ((==) payee)
-                |> Maybe.withDefault False
+applyPayee : String -> Transaction -> Bool
+applyPayee payee transaction =
+    transaction.payee
+        |> Maybe.map ((==) payee)
+        |> Maybe.withDefault False
 
 
-applySince : Filter SinceFilter -> Transaction -> Bool
-applySince sinceFilter transaction =
-    case sinceFilter of
-        Active (SinceFilter since) ->
-            DateCompare.is
-                DateCompare.SameOrAfter
-                transaction.date
-                since
-
-        Inactive ->
-            True
+applySince : Date -> Transaction -> Bool
+applySince since transaction =
+    DateCompare.is
+        DateCompare.SameOrAfter
+        transaction.date
+        since
 
 
 isBetweenDates : List Transaction -> Date -> Bool

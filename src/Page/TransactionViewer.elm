@@ -35,7 +35,7 @@ view { filters, datePicker, transactions, viewState } =
         ]
 
 
-viewSavings : Model.Filters -> List Model.Transaction -> String
+viewSavings : Model.List FilterType -> List Model.Transaction -> String
 viewSavings filters transactions =
     transactions
         |> TransactionReducer.savings filters
@@ -65,7 +65,7 @@ selectorRow title children =
         ]
 
 
-viewAdjustmentDropdown : Model.Filters -> Dropdown.State -> Html Msg
+viewAdjustmentDropdown : Model.List FilterType -> Dropdown.State -> Html Msg
 viewAdjustmentDropdown { adjustment } dropdown =
     Dropdown.dropdown
         dropdown
@@ -114,7 +114,7 @@ adjustmentFilterString filter =
             "Nothing"
 
 
-viewCategoryDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
+viewCategoryDropdown : List Model.Transaction -> Model.List FilterType -> Dropdown.State -> Html Msg
 viewCategoryDropdown transactions filters dropdown =
     let
         categoryName =
@@ -135,7 +135,7 @@ viewCategoryDropdown transactions filters dropdown =
             }
 
 
-categoryDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
+categoryDropdownItems : Model.List FilterType -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
 categoryDropdownItems filters transactions =
     let
         unselectItem =
@@ -159,7 +159,7 @@ categoryDropdownItem ( name, filter ) =
         [ text name ]
 
 
-viewPayeeDropdown : List Model.Transaction -> Model.Filters -> Dropdown.State -> Html Msg
+viewPayeeDropdown : List Model.Transaction -> Model.List FilterType -> Dropdown.State -> Html Msg
 viewPayeeDropdown transactions filters dropdown =
     let
         payeeName =
@@ -180,7 +180,7 @@ viewPayeeDropdown transactions filters dropdown =
             }
 
 
-payeeDropdownItems : Model.Filters -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
+payeeDropdownItems : Model.List FilterType -> List Model.Transaction -> List (Dropdown.DropdownItem Msg)
 payeeDropdownItems filters transactions =
     let
         unselectItem =

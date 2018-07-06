@@ -19,9 +19,27 @@ type ErrorType
     | ImpossibleState
 
 
+type FilterType
+    = CategoryFilter (Filter String)
+    | PayeeFilter (Filter String)
+    | SinceFilter (Filter Date)
+    | AdjustmentFilter (Filter AdjustmentFilterVal)
+
+
+type AdjustmentFilterVal
+    = HalfAsMuch
+    | TenPercent
+    | TwentyFivePercent
+
+
+type Filter a
+    = Active a
+    | Inactive
+
+
 type alias TransactionViewerData =
     { transactions : List Transaction
-    , filters : Filters
+    , filters : List FilterType
     , viewState : TransactionViewerViewState
     , datePicker : DatePicker.DatePicker
     }
@@ -60,37 +78,6 @@ type Model
     | PrivacyPolicy
 
 
-type CategoryFilter
-    = CategoryFilter String
-
-
-type PayeeFilter
-    = PayeeFilter String
-
-
-type SinceFilter
-    = SinceFilter Date
-
-
-type AdjustmentFilter
-    = HalfAsMuch
-    | TenPercent
-    | TwentyFivePercent
-
-
-type Filter f
-    = Inactive
-    | Active f
-
-
-type alias Filters =
-    { category : Filter CategoryFilter
-    , since : Filter SinceFilter
-    , adjustment : Filter AdjustmentFilter
-    , payee : Filter PayeeFilter
-    }
-
-
 type AccessToken
     = AccessToken String
 
@@ -114,13 +101,13 @@ type alias Transaction =
     }
 
 
-emptyFilters : Filters
+emptyFilters : List FilterType
 emptyFilters =
-    { category = Inactive
-    , since = Inactive
-    , adjustment = Inactive
-    , payee = Inactive
-    }
+    [ AdjustmentFilter Inactive
+    , CategoryFilter Inactive
+    , PayeeFilter Inactive
+    , SinceFilter Inactive
+    ]
 
 
 initialViewState : TransactionViewerViewState

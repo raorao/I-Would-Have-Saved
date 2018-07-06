@@ -63,7 +63,7 @@ update msg model =
                     { transactions = transactions
                     , datePicker = datePicker
                     , viewState = initialViewState
-                    , filters = emptyFilters
+                    , filters = emptyList FilterType
                     }
                 , datePickerCmd
                 )
@@ -81,11 +81,11 @@ update msg model =
                 filters =
                     pageData.filters
 
-                newFilters =
+                newList FilterType =
                     { filters | category = categoryFilter }
 
                 newPageData =
-                    { pageData | filters = newFilters }
+                    { pageData | filters = newList FilterType }
             in
                 ( TransactionViewer newPageData, Cmd.none )
 
@@ -94,11 +94,11 @@ update msg model =
                 filters =
                     pageData.filters
 
-                newFilters =
+                newList FilterType =
                     { filters | payee = payeeFilter }
 
                 newPageData =
-                    { pageData | filters = newFilters }
+                    { pageData | filters = newList FilterType }
             in
                 ( TransactionViewer newPageData, Cmd.none )
 
@@ -107,11 +107,11 @@ update msg model =
                 filters =
                     pageData.filters
 
-                newFilters =
+                newList FilterType =
                     { filters | adjustment = adjustmentFilter }
 
                 newPageData =
-                    { pageData | filters = newFilters }
+                    { pageData | filters = newList FilterType }
             in
                 ( TransactionViewer newPageData, Cmd.none )
 
@@ -134,11 +134,11 @@ update msg model =
                 filters =
                     pageData.filters
 
-                newFilters =
+                newList FilterType =
                     { filters | since = since }
 
                 newPageData =
-                    { pageData | filters = newFilters, datePicker = newDatePicker }
+                    { pageData | filters = newList FilterType, datePicker = newDatePicker }
             in
                 ( TransactionViewer newPageData
                 , Cmd.map SetDatePicker datePickerCmd
